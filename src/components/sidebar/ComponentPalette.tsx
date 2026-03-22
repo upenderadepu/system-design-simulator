@@ -39,6 +39,15 @@ export function ComponentPalette() {
   function handleDragStart(e: DragEvent, componentId: string) {
     e.dataTransfer.setData("application/systemsim-component", componentId);
     e.dataTransfer.effectAllowed = "copy";
+
+    // Create a small custom drag ghost to prevent full-page shadow
+    const ghost = document.createElement("div");
+    ghost.style.cssText = "position:absolute;top:-1000px;left:-1000px;padding:6px 12px;background:#18181b;border:1px solid #3f3f46;border-radius:8px;color:#e4e4e7;font-size:12px;font-family:system-ui;white-space:nowrap;";
+    const comp = SYSTEM_COMPONENTS.find((c) => c.id === componentId);
+    ghost.textContent = comp?.label ?? componentId;
+    document.body.appendChild(ghost);
+    e.dataTransfer.setDragImage(ghost, 0, 0);
+    requestAnimationFrame(() => document.body.removeChild(ghost));
   }
 
   const query = search.toLowerCase().trim();
