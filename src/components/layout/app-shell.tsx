@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect } from "react";
 import { ReactFlowProvider } from "@xyflow/react";
 import { TopBar } from "./top-bar";
 import { Sidebar } from "@/components/sidebar/Sidebar";
@@ -11,27 +11,11 @@ import { useCanvasStore } from "@/store/canvasStore";
 import { useSimulationStore } from "@/store/simulationStore";
 import { runSimulation } from "@/engine/simulator";
 import { scoreDesign } from "@/scoring/scorer";
-import { playDrop, playSimulate, playScore } from "@/lib/sounds";
 import { Toast } from "@/components/ui/Toast";
 
 export function AppShell() {
   const leftSidebarOpen = useAppStore((s) => s.leftSidebarOpen);
   const rightPanelOpen = useAppStore((s) => s.rightPanelOpen);
-  const prevNodeCount = useRef(0);
-
-  // Watch for new nodes being added to play drop sound
-  useEffect(() => {
-    const unsub = useCanvasStore.subscribe((state) => {
-      const count = state.nodes.length;
-      if (count > prevNodeCount.current) {
-        const soundEnabled = useAppStore.getState().soundEnabled;
-        if (soundEnabled) playDrop();
-      }
-      prevNodeCount.current = count;
-    });
-    return unsub;
-  }, []);
-
   const handleSimulate = useCallback(() => {
     const { nodes, edges } = useCanvasStore.getState();
     const { config } = useSimulationStore.getState();
@@ -40,9 +24,6 @@ export function AppShell() {
       useAppStore.getState().showToast("No components to simulate", "info");
       return;
     }
-
-    const soundEnabled = useAppStore.getState().soundEnabled;
-    if (soundEnabled) playSimulate();
 
     useSimulationStore.getState().setRunning(true);
 
@@ -78,9 +59,6 @@ export function AppShell() {
     const result = scoreDesign(nodes, edges);
     useSimulationStore.getState().setScoreResult(result);
     useSimulationStore.getState().setShowScore(true);
-
-    const soundEnabled = useAppStore.getState().soundEnabled;
-    if (soundEnabled) playScore();
 
     useAppStore.getState().showToast("Design scored!", "success");
   }, []);

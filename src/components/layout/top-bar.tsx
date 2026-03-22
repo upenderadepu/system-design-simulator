@@ -11,8 +11,6 @@ import {
   PanelRight,
   Trash2,
   Download,
-  Volume2,
-  VolumeX,
 } from "lucide-react";
 import { useAppStore } from "@/store/appStore";
 import { useCanvasStore } from "@/store/canvasStore";
@@ -34,8 +32,6 @@ export function TopBar({ onSimulate, onScore, onClearCanvas }: TopBarProps) {
   const setSelectedProblem = useAppStore((s) => s.setSelectedProblem);
   const toggleLeftSidebar = useAppStore((s) => s.toggleLeftSidebar);
   const toggleRightPanel = useAppStore((s) => s.toggleRightPanel);
-  const soundEnabled = useAppStore((s) => s.soundEnabled);
-  const toggleSound = useAppStore((s) => s.toggleSound);
   const addNode = useCanvasStore((s) => s.addNode);
 
   const currentProblem = PROBLEMS.find((p) => p.id === selectedProblemId);
@@ -165,14 +161,6 @@ export function TopBar({ onSimulate, onScore, onClearCanvas }: TopBarProps) {
 
       {/* Right section */}
       <div className="flex items-center gap-2">
-        <button
-          onClick={toggleSound}
-          className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
-          title={soundEnabled ? "Mute sounds" : "Enable sounds"}
-        >
-          {soundEnabled ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
-        </button>
-
         <button
           onClick={onClearCanvas}
           className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-rose-400"
