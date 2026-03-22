@@ -59,7 +59,7 @@ export function SimulationControls({ onSimulate }: SimulationControlsProps) {
             min={100}
             max={500000}
             step={100}
-            className="[&_[role=slider]]:h-3 [&_[role=slider]]:w-3 [&_[role=slider]]:border-cyan-500 [&_[role=slider]]:bg-cyan-500"
+            className=""
           />
         </div>
 
@@ -76,7 +76,7 @@ export function SimulationControls({ onSimulate }: SimulationControlsProps) {
             min={1}
             max={60}
             step={1}
-            className="[&_[role=slider]]:h-3 [&_[role=slider]]:w-3 [&_[role=slider]]:border-cyan-500 [&_[role=slider]]:bg-cyan-500"
+            className=""
           />
         </div>
       </div>

@@ -178,14 +178,6 @@ export function TopBar({ onSimulate, onScore }: TopBarProps) {
       {/* Right section */}
       <div className="flex items-center gap-2">
         <button
-          onClick={toggleTheme}
-          className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
-          title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-        >
-          {theme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
-        </button>
-
-        <button
           onClick={toggleSound}
           className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
           title={soundEnabled ? "Mute sounds" : "Enable sounds"}

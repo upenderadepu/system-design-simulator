@@ -30,14 +30,17 @@ function Slider({
   return (
     <div
       data-slot="slider"
-      className={cn("relative flex w-full touch-none items-center select-none", className)}
+      className={cn("relative flex h-5 w-full touch-none items-center select-none", className)}
     >
-      <div className="relative h-1 w-full overflow-hidden rounded-full bg-muted">
+      {/* Track background */}
+      <div className="relative h-1.5 w-full rounded-full bg-zinc-800">
+        {/* Filled track */}
         <div
-          className="absolute h-full bg-primary rounded-full"
+          className="absolute h-full rounded-full bg-cyan-500"
           style={{ width: `${percentage}%` }}
         />
       </div>
+      {/* Native range input — fully visible, styled */}
       <input
         type="range"
         min={min}
@@ -48,11 +51,14 @@ function Slider({
         onChange={(e) => {
           onValueChange?.([Number(e.target.value)])
         }}
-        className="absolute inset-0 w-full cursor-pointer opacity-0"
-      />
-      <div
-        className="absolute size-3 rounded-full border border-ring bg-white ring-ring/50 transition-[color,box-shadow] hover:ring-3 focus-visible:ring-3"
-        style={{ left: `calc(${percentage}% - 6px)` }}
+        className={cn(
+          "absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none bg-transparent",
+          "[&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-cyan-500 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-sm [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110 [&::-webkit-slider-thumb]:active:scale-95",
+          "[&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-cyan-500 [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:shadow-sm",
+          "[&::-webkit-slider-runnable-track]:h-0 [&::-webkit-slider-runnable-track]:appearance-none",
+          "[&::-moz-range-track]:h-0 [&::-moz-range-track]:appearance-none",
+          disabled && "pointer-events-none opacity-50"
+        )}
       />
     </div>
   )

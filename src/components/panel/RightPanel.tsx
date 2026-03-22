@@ -179,7 +179,7 @@ function PropertiesTab() {
                   min={1}
                   max={20}
                   step={1}
-                  className="[&_[role=slider]]:h-3 [&_[role=slider]]:w-3 [&_[role=slider]]:border-cyan-500 [&_[role=slider]]:bg-cyan-500"
+                  className=""
                 />
                 <p className="mt-1 text-[11px] text-zinc-400">
                   Effective capacity: {((selectedNode.data.maxQPS === Infinity ? Infinity : selectedNode.data.maxQPS * selectedNode.data.replicas)).toLocaleString()} QPS
