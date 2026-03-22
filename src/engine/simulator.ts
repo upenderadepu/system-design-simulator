@@ -50,6 +50,9 @@ export function runSimulation(
     incomingQPS.set(entry.id, qpsPerEntry);
   }
 
+  // Build node lookup map for O(1) access
+  const nodeMap = new Map(nodes.map((n) => [n.id, n]));
+
   // BFS propagation
   const queue = [...entryNodes.map((n) => n.id)];
   const visited = new Set<string>();
@@ -60,7 +63,7 @@ export function runSimulation(
     if (visited.has(nodeId)) continue;
     visited.add(nodeId);
 
-    const node = nodes.find((n) => n.id === nodeId);
+    const node = nodeMap.get(nodeId);
     if (!node) continue;
 
     const data = node.data;

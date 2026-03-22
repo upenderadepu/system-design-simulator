@@ -16,8 +16,3 @@ export interface SystemComponent {
   stateful: boolean;
   description: string;
 }
-
-export interface PlacedComponent extends SystemComponent {
-  nodeId: string;
-  replicas: number;
-}

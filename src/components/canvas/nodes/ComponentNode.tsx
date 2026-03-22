@@ -70,7 +70,7 @@ function ComponentNodeInner({ data, selected }: NodeProps) {
       <span className="max-w-[90px] truncate text-[10px] font-medium text-zinc-300">
         {nodeData.label}
       </span>
-      <span className="font-mono text-[8px] text-zinc-600">{nodeData.maxQPS === Infinity ? '∞' : ((nodeData.maxQPS ?? 0)/1000).toFixed(0) + 'k'} qps</span>
+      <span className="font-mono text-[8px] text-zinc-400">{nodeData.maxQPS === Infinity ? '∞' : ((nodeData.maxQPS ?? 0)/1000).toFixed(0) + 'k'} qps</span>
 
       {/* Replicas badge */}
       {replicas > 1 && (

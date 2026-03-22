@@ -11,8 +11,6 @@ import {
   PanelRight,
   Trash2,
   Download,
-  Sun,
-  Moon,
   Volume2,
   VolumeX,
 } from "lucide-react";
@@ -26,29 +24,19 @@ import type { ComponentNodeData } from "@/store/canvasStore";
 interface TopBarProps {
   onSimulate: () => void;
   onScore: () => void;
+  onClearCanvas: () => void;
 }
 
-export function TopBar({ onSimulate, onScore }: TopBarProps) {
+export function TopBar({ onSimulate, onScore, onClearCanvas }: TopBarProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const selectedProblemId = useAppStore((s) => s.selectedProblemId);
   const setSelectedProblem = useAppStore((s) => s.setSelectedProblem);
-  const leftSidebarOpen = useAppStore((s) => s.leftSidebarOpen);
-  const rightPanelOpen = useAppStore((s) => s.rightPanelOpen);
   const toggleLeftSidebar = useAppStore((s) => s.toggleLeftSidebar);
   const toggleRightPanel = useAppStore((s) => s.toggleRightPanel);
-  const theme = useAppStore((s) => s.theme);
-  const toggleTheme = useAppStore((s) => s.toggleTheme);
   const soundEnabled = useAppStore((s) => s.soundEnabled);
   const toggleSound = useAppStore((s) => s.toggleSound);
-  const showToast = useAppStore((s) => s.showToast);
-  const clearCanvasRaw = useCanvasStore((s) => s.clearCanvas);
   const addNode = useCanvasStore((s) => s.addNode);
-
-  const clearCanvas = useCallback(() => {
-    clearCanvasRaw();
-    showToast("Canvas cleared", "info");
-  }, [clearCanvasRaw, showToast]);
 
   const currentProblem = PROBLEMS.find((p) => p.id === selectedProblemId);
 
@@ -56,7 +44,7 @@ export function TopBar({ onSimulate, onScore }: TopBarProps) {
     const problem = PROBLEMS.find((p) => p.id === selectedProblemId);
     if (!problem) return;
 
-    clearCanvas();
+    onClearCanvas();
 
     const nodeIdMap = new Map<string, string>();
 
@@ -104,7 +92,7 @@ export function TopBar({ onSimulate, onScore }: TopBarProps) {
       }
       useCanvasStore.setState({ edges: newEdges });
     }, 50);
-  }, [selectedProblemId, clearCanvas, addNode]);
+  }, [selectedProblemId, onClearCanvas, addNode]);
 
   return (
     <header className="glass-panel flex h-14 shrink-0 items-center justify-between border-b border-zinc-800/80 px-3">
@@ -186,7 +174,7 @@ export function TopBar({ onSimulate, onScore }: TopBarProps) {
         </button>
 
         <button
-          onClick={clearCanvas}
+          onClick={onClearCanvas}
           className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-rose-400"
           title="Clear canvas"
         >

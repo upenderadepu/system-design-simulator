@@ -133,7 +133,7 @@ export function AppShell() {
   return (
     <ReactFlowProvider>
       <div className="flex h-full flex-col">
-        <TopBar onSimulate={handleSimulate} onScore={handleScore} />
+        <TopBar onSimulate={handleSimulate} onScore={handleScore} onClearCanvas={handleClearCanvas} />
 
         <div className="flex flex-1 overflow-hidden">
           <Sidebar open={leftSidebarOpen} />
