@@ -18,7 +18,7 @@ function CategorySection({ category }: { category: CategoryScore }) {
     pct >= 50 ? "bg-amber-500" : "bg-rose-500";
 
   return (
-    <div className="rounded-lg bg-zinc-700/40 px-3 py-2.5">
+    <div className="rounded-md bg-zinc-800 px-3 py-2.5">
       <button
         onClick={() => setExpanded(!expanded)}
         className="flex w-full items-center justify-between"
@@ -38,7 +38,7 @@ function CategorySection({ category }: { category: CategoryScore }) {
         </span>
       </button>
 
-      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-800">
+      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-700">
         <motion.div
           className={`h-full rounded-full ${barColor}`}
           initial={{ width: 0 }}
@@ -99,14 +99,13 @@ export function ScoreReport() {
   if (!scoreResult) {
     return (
       <div className="flex flex-col items-center gap-3 py-10 text-center">
-        <div className="relative flex h-12 w-12 items-center justify-center rounded-full bg-zinc-700/50">
-          <Trophy className="h-5 w-5 text-zinc-500" />
-          <div className="absolute inset-0 rounded-full border border-dashed border-zinc-700/50" style={{ animation: 'spin 12s linear infinite' }} />
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-800 border border-zinc-700">
+          <Trophy className="h-4 w-4 text-zinc-500" />
         </div>
         <div>
           <p className="text-xs font-medium text-zinc-300">Ready to evaluate</p>
           <p className="mt-1 max-w-[220px] text-xs text-zinc-500">
-            Design your system on the canvas, then click <span className="text-cyan-400/80">Score</span> to see how you did
+            Design your system on the canvas, then click <span className="text-cyan-500">Score</span> to see how you did
           </p>
         </div>
       </div>
@@ -135,7 +134,7 @@ export function ScoreReport() {
               const strokeColor = scoreResult.total >= 71 ? '#10b981' : scoreResult.total >= 51 ? '#22d3ee' : scoreResult.total >= 31 ? '#f59e0b' : '#ef4444';
               return (
                 <svg width="96" height="96" className="-rotate-90">
-                  <circle cx="48" cy="48" r={radius} fill="none" stroke="rgba(39,39,42,0.8)" strokeWidth="6" />
+                  <circle cx="48" cy="48" r={radius} fill="none" stroke="rgb(39,39,42)" strokeWidth="6" />
                   <motion.circle
                     cx="48" cy="48" r={radius} fill="none"
                     stroke={strokeColor} strokeWidth="6"
@@ -163,12 +162,12 @@ export function ScoreReport() {
             {scoreResult.verdict}
           </Badge>
 
-          <p className="text-center text-xs text-zinc-400">
+          <p className="text-center text-xs text-zinc-500">
             {scoreResult.summary}
           </p>
         </div>
 
-        <Separator className="bg-zinc-800/60" />
+        <Separator className="bg-zinc-800" />
 
         {/* Category breakdowns */}
         <div className="space-y-2">
@@ -183,7 +182,7 @@ export function ScoreReport() {
         {/* Top improvements */}
         {topImprovements.length > 0 && (
           <>
-            <Separator className="bg-zinc-800/60" />
+            <Separator className="bg-zinc-800" />
             <div className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
                 Top Improvements
@@ -191,9 +190,9 @@ export function ScoreReport() {
               {topImprovements.map((item, i) => (
                 <div
                   key={i}
-                  className="flex items-start gap-2 rounded-lg bg-cyan-500/5 border border-cyan-500/10 px-2.5 py-2"
+                  className="flex items-start gap-2 rounded-md bg-zinc-800 border border-zinc-700 px-2.5 py-2"
                 >
-                  <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-cyan-500/20 text-[11px] font-bold text-cyan-400">
+                  <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-zinc-700 text-[11px] font-bold text-zinc-300">
                     {i + 1}
                   </span>
                   <span className="text-xs text-zinc-400">{item}</span>

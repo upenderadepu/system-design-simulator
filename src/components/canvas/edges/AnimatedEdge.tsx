@@ -32,14 +32,6 @@ function AnimatedEdgeInner({
 
   return (
     <g>
-      {/* Glow layer */}
-      <path
-        d={edgePath}
-        fill="none"
-        stroke="rgba(34, 211, 238, 0.08)"
-        strokeWidth={6}
-        strokeLinecap="round"
-      />
       {/* Main edge */}
       <BaseEdge
         id={id}
@@ -47,34 +39,26 @@ function AnimatedEdgeInner({
         markerEnd={markerEnd}
         style={{
           ...style,
-          stroke: "rgba(34, 211, 238, 0.25)",
+          stroke: isRunning ? "rgb(6, 182, 212)" : "rgb(82, 82, 91)",
           strokeWidth: 1.5,
         }}
       />
       {/* Animated dots — only render when simulation is running */}
       {isRunning && (
         <>
-          <circle r="2.5" fill="rgb(34, 211, 238)" opacity="0.9">
+          <circle r="2" fill="rgb(6, 182, 212)" opacity="0.8">
             <animateMotion
               dur="2s"
               repeatCount="indefinite"
               path={edgePath}
             />
           </circle>
-          <circle r="2" fill="rgb(34, 211, 238)" opacity="0.5">
+          <circle r="1.5" fill="rgb(6, 182, 212)" opacity="0.4">
             <animateMotion
               dur="2s"
               repeatCount="indefinite"
               path={edgePath}
               begin="0.7s"
-            />
-          </circle>
-          <circle r="1.5" fill="rgb(34, 211, 238)" opacity="0.3">
-            <animateMotion
-              dur="2s"
-              repeatCount="indefinite"
-              path={edgePath}
-              begin="1.4s"
             />
           </circle>
         </>

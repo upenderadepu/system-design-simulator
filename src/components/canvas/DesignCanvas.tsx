@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, type DragEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, type DragEvent } from "react";
 import {
   ReactFlow,
   Controls,
@@ -27,7 +27,18 @@ export function DesignCanvas() {
   const onEdgesChange = useCanvasStore((s) => s.onEdgesChange);
   const onConnect = useCanvasStore((s) => s.onConnect);
   const addNode = useCanvasStore((s) => s.addNode);
+  const updateNodeData = useCanvasStore((s) => s.updateNodeData);
   const setSelectedNode = useCanvasStore((s) => s.setSelectedNode);
+
+  // Listen for text node edits and persist them to the store
+  useEffect(() => {
+    function handleTextNodeUpdate(e: Event) {
+      const { id, text } = (e as CustomEvent).detail;
+      updateNodeData(id, { text } as Record<string, unknown>);
+    }
+    window.addEventListener("textnode:update", handleTextNodeUpdate);
+    return () => window.removeEventListener("textnode:update", handleTextNodeUpdate);
+  }, [updateNodeData]);
 
   const onDragOver = useCallback((event: DragEvent) => {
     event.preventDefault();
@@ -98,7 +109,7 @@ export function DesignCanvas() {
   const isEmpty = nodes.length === 0;
 
   return (
-    <div ref={reactFlowWrapper} className="canvas-glow relative flex-1">
+    <div ref={reactFlowWrapper} className="relative flex-1">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -114,24 +125,25 @@ export function DesignCanvas() {
         defaultEdgeOptions={{ type: "animated" }}
         fitView
         proOptions={{ hideAttribution: true }}
-        className="bg-zinc-900"
+        className="bg-zinc-950"
       >
         <Background
           variant={BackgroundVariant.Dots}
           gap={20}
-          size={1.2}
-          color="rgba(161, 161, 170, 0.3)"
-          className="!bg-zinc-900"
+          size={1}
+          color="rgba(63, 63, 70, 0.5)"
+          className="!bg-zinc-950"
         />
         <Controls
-          className="!rounded-lg !border-zinc-700 !bg-zinc-800/90 !shadow-lg [&>button]:!border-zinc-700 [&>button]:!bg-zinc-800 [&>button]:!text-zinc-300 [&>button:hover]:!bg-zinc-700 [&>button:hover]:!text-zinc-100"
+          className="!rounded-md !border !border-zinc-800 !bg-zinc-900 !shadow-sm [&>button]:!border-zinc-800 [&>button]:!bg-zinc-900 [&>button]:!text-zinc-400 [&>button:hover]:!bg-zinc-800 [&>button:hover]:!text-zinc-200"
           position="bottom-left"
         />
         <MiniMap
-          className="!rounded-lg !border-zinc-700 !bg-zinc-800/80"
-          maskColor="rgba(0, 0, 0, 0.7)"
+          className="!rounded-md !border !border-zinc-800 !bg-zinc-900"
+          maskColor="rgba(9, 9, 11, 0.7)"
           nodeColor={miniMapNodeColor}
           position="bottom-right"
+          style={{ width: 140, height: 90 }}
         />
       </ReactFlow>
 
@@ -139,14 +151,11 @@ export function DesignCanvas() {
       {isEmpty && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <div className="flex flex-col items-center gap-4 text-center">
-            <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl border border-zinc-700 bg-zinc-800/80">
-              <Layers className="h-8 w-8 text-zinc-400" />
-              <div className="absolute inset-0 rounded-2xl" style={{ animation: 'empty-pulse 3s ease-in-out infinite' }} />
-              <div className="absolute inset-0 rounded-2xl" style={{ animation: 'empty-pulse 3s ease-in-out infinite 1s' }} />
-              <div className="absolute inset-0 rounded-2xl" style={{ animation: 'empty-pulse 3s ease-in-out infinite 2s' }} />
+            <div className="flex h-16 w-16 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900">
+              <Layers className="h-7 w-7 text-zinc-500" />
             </div>
             <div>
-              <p className="gradient-text text-sm font-medium">
+              <p className="text-sm font-medium text-zinc-300">
                 Design your system
               </p>
               <p className="mt-1 max-w-xs text-xs leading-relaxed text-zinc-400">

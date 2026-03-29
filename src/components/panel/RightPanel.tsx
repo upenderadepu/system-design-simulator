@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Info, Trash2, Lightbulb, ChevronDown, ChevronRight, CheckSquare } from "lucide-react";
-import { useCanvasStore } from "@/store/canvasStore";
+import { useCanvasStore, type ComponentNodeData } from "@/store/canvasStore";
 import { useAppStore } from "@/store/appStore";
 import { getProblemById } from "@/data/problems";
 import { SimulationControls } from "./SimulationControls";
@@ -26,7 +26,7 @@ export function RightPanel({ open, onSimulate }: RightPanelProps) {
 
   return (
     <aside
-      className={`glass-panel flex shrink-0 flex-col border-l border-zinc-800/80 overflow-hidden transition-all duration-300 ease-in-out ${
+      className={`flex shrink-0 flex-col border-l border-zinc-800 bg-zinc-900 overflow-hidden transition-all duration-200 ${
         open ? "w-[300px] opacity-100" : "w-0 opacity-0 border-l-0"
       }`}
       aria-hidden={!open || undefined}
@@ -34,28 +34,28 @@ export function RightPanel({ open, onSimulate }: RightPanelProps) {
     >
       <div className="flex w-[300px] flex-1 flex-col">
         <Tabs value={activeRightTab} onValueChange={(v) => setActiveRightTab(v as typeof activeRightTab)} className="flex flex-1 flex-col">
-          <TabsList className="mx-2 mt-2 h-9 w-auto shrink-0 bg-zinc-700/40">
+          <TabsList className="mx-2 mt-2 h-8 w-auto shrink-0 bg-zinc-800">
             <TabsTrigger
               value="properties"
-              className="h-8 px-4 text-sm data-[state=active]:border-b-2 data-[state=active]:border-cyan-400 data-[state=active]:bg-transparent data-[state=active]:text-zinc-100"
+              className="h-7 px-3 text-xs data-[state=active]:bg-zinc-700 data-[state=active]:text-zinc-100"
             >
               Properties
             </TabsTrigger>
             <TabsTrigger
               value="simulation"
-              className="h-8 px-4 text-sm data-[state=active]:border-b-2 data-[state=active]:border-cyan-400 data-[state=active]:bg-transparent data-[state=active]:text-zinc-100"
+              className="h-7 px-3 text-xs data-[state=active]:bg-zinc-700 data-[state=active]:text-zinc-100"
             >
               Simulate
             </TabsTrigger>
             <TabsTrigger
               value="score"
-              className="h-8 px-4 text-sm data-[state=active]:border-b-2 data-[state=active]:border-cyan-400 data-[state=active]:bg-transparent data-[state=active]:text-zinc-100"
+              className="h-7 px-3 text-xs data-[state=active]:bg-zinc-700 data-[state=active]:text-zinc-100"
             >
               Score
             </TabsTrigger>
             <TabsTrigger
               value="capacity"
-              className="h-8 px-4 text-sm data-[state=active]:border-b-2 data-[state=active]:border-cyan-400 data-[state=active]:bg-transparent data-[state=active]:text-zinc-100"
+              className="h-7 px-3 text-xs data-[state=active]:bg-zinc-700 data-[state=active]:text-zinc-100"
             >
               Capacity
             </TabsTrigger>
@@ -73,7 +73,7 @@ export function RightPanel({ open, onSimulate }: RightPanelProps) {
             <ScrollArea className="h-full">
               <div className="p-3 space-y-4">
                 <SimulationControls onSimulate={onSimulate} />
-                <Separator className="bg-zinc-700/40" />
+                <Separator className="bg-zinc-800" />
                 <MetricsDisplay />
               </div>
             </ScrollArea>
@@ -105,7 +105,9 @@ function PropertiesTab() {
   const deleteNode = useCanvasStore((s) => s.deleteNode);
   const selectedProblemId = useAppStore((s) => s.selectedProblemId);
 
-  const selectedNode = nodes.find((n) => n.id === selectedNodeId);
+  const selectedNode = nodes.find((n) => n.id === selectedNodeId) as
+    | (typeof nodes[number] & { data: ComponentNodeData })
+    | undefined;
   const problem = getProblemById(selectedProblemId);
 
   return (
@@ -126,7 +128,7 @@ function PropertiesTab() {
             ].map((item) => (
               <div
                 key={item.label}
-                className="flex items-center justify-between rounded-md bg-zinc-700/40 px-2.5 py-1.5"
+                className="flex items-center justify-between rounded-md bg-zinc-800 px-2.5 py-1.5"
               >
                 <span className="text-xs text-zinc-400">{item.label}</span>
                 <span className="font-mono text-xs text-zinc-300">{item.value}</span>
@@ -139,7 +141,7 @@ function PropertiesTab() {
       {/* Constraints */}
       {problem && problem.constraints.length > 0 && (
         <>
-          <Separator className="bg-zinc-700/40" />
+          <Separator className="bg-zinc-800" />
           <ConstraintsSection constraints={problem.constraints} />
         </>
       )}
@@ -147,42 +149,70 @@ function PropertiesTab() {
       {/* Hints */}
       {problem && problem.hints.length > 0 && (
         <>
-          <Separator className="bg-zinc-700/40" />
+          <Separator className="bg-zinc-800" />
           <HintsSection hints={problem.hints} />
         </>
       )}
 
-      <Separator className="bg-zinc-700/40" />
+      <Separator className="bg-zinc-800" />
 
       {/* Selected node properties */}
-      {selectedNode ? (
+      {selectedNode && selectedNode.type === "text" ? (
+        <div className="space-y-3">
+          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+            Text Annotation
+          </p>
+          <div className="space-y-2">
+            <div className="rounded-md bg-zinc-800 px-3 py-2">
+              <p className="text-xs font-medium text-zinc-200">
+                Text Note
+              </p>
+              <p className="mt-0.5 text-xs text-zinc-500">
+                Double-click on canvas to edit
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => deleteNode(selectedNode.id)}
+              className="w-full gap-1.5 border-zinc-700 text-rose-400 hover:bg-zinc-800 hover:text-rose-300"
+            >
+              <Trash2 className="h-3 w-3" />
+              Remove Note
+            </Button>
+          </div>
+        </div>
+      ) : selectedNode ? (
+        (() => {
+          const data = selectedNode.data as ComponentNodeData;
+          return (
         <div className="space-y-3">
           <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
             Component Properties
           </p>
 
           <div className="space-y-2">
-            <div className="rounded-lg bg-zinc-700/40 px-3 py-2">
+            <div className="rounded-md bg-zinc-800 px-3 py-2">
               <p className="text-xs font-medium text-zinc-200">
-                {selectedNode.data.label}
+                {data.label as string}
               </p>
-              <p className="mt-0.5 text-xs text-zinc-400">
-                {selectedNode.data.category} · Max {selectedNode.data.maxQPS === Infinity ? "∞" : selectedNode.data.maxQPS.toLocaleString()} QPS
+              <p className="mt-0.5 text-xs text-zinc-500">
+                {data.category as string} · Max {(data.maxQPS as number) === Infinity ? "\u221e" : (data.maxQPS as number).toLocaleString()} QPS
               </p>
             </div>
 
             {/* Replicas slider */}
-            {selectedNode.data.scalable && (
+            {data.scalable && (
               <div>
                 <div className="mb-1.5 flex items-center justify-between">
                   <label className="text-xs text-zinc-400">Replicas</label>
-                  <span className="font-mono text-xs text-cyan-400">
-                    {selectedNode.data.replicas}
+                  <span className="font-mono text-xs text-cyan-500">
+                    {data.replicas as number}
                   </span>
                 </div>
                 <Slider
                   aria-label="Replicas"
-                  value={[selectedNode.data.replicas]}
+                  value={[data.replicas as number]}
                   onValueChange={(v) =>
                     updateNodeData(selectedNode.id, { replicas: Array.isArray(v) ? v[0] : v })
                   }
@@ -192,7 +222,7 @@ function PropertiesTab() {
                   className=""
                 />
                 <p className="mt-1 text-[11px] text-zinc-400">
-                  Effective capacity: {((selectedNode.data.maxQPS === Infinity ? Infinity : selectedNode.data.maxQPS * selectedNode.data.replicas)).toLocaleString()} QPS
+                  Effective capacity: {(((data.maxQPS as number) === Infinity ? Infinity : (data.maxQPS as number) * (data.replicas as number))).toLocaleString()} QPS
                 </p>
               </div>
             )}
@@ -200,8 +230,8 @@ function PropertiesTab() {
             {/* Info */}
             <div className="space-y-1">
               {[
-                { label: "Base Latency", value: `${selectedNode.data.latencyMs}ms` },
-                { label: "Scalable", value: selectedNode.data.scalable ? "Yes" : "No" },
+                { label: "Base Latency", value: `${data.latencyMs}ms` },
+                { label: "Scalable", value: data.scalable ? "Yes" : "No" },
               ].map((item) => (
                 <div
                   key={item.label}
@@ -217,23 +247,25 @@ function PropertiesTab() {
               variant="outline"
               size="sm"
               onClick={() => deleteNode(selectedNode.id)}
-              className="w-full gap-1.5 border-rose-500/20 text-rose-400 hover:bg-rose-500/10 hover:text-rose-300"
+              className="w-full gap-1.5 border-zinc-700 text-rose-400 hover:bg-zinc-800 hover:text-rose-300"
             >
               <Trash2 className="h-3 w-3" />
               Remove Component
             </Button>
           </div>
         </div>
+          );
+        })()
       ) : (
         <div className="flex flex-col items-center gap-3 py-6 text-center">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-700/50">
-            <Info className="h-4 w-4 text-zinc-400" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-800">
+            <Info className="h-4 w-4 text-zinc-500" />
           </div>
           <div>
             <p className="text-xs font-medium text-zinc-400">
               No component selected
             </p>
-            <p className="mt-1 text-xs text-zinc-400">
+            <p className="mt-1 text-xs text-zinc-500">
               Click a component on the canvas to edit its properties.
             </p>
           </div>
@@ -263,7 +295,7 @@ function ConstraintsSection({ constraints }: { constraints: string[] }) {
       {constraints.length > 3 && (
         <button
           onClick={() => setExpanded(!expanded)}
-          className="flex items-center gap-1 text-xs text-cyan-400 transition-colors hover:text-cyan-300"
+          className="flex items-center gap-1 text-xs text-cyan-500 transition-colors hover:text-cyan-400"
         >
           {expanded ? (
             <>
@@ -306,24 +338,24 @@ function HintsSection({ hints }: { hints: { title: string; content: string }[] }
         {hints.map((hint, i) => (
           <div
             key={i}
-            className="rounded-lg border border-cyan-500/10 bg-cyan-500/5 overflow-hidden"
+            className="rounded-md border border-zinc-700 bg-zinc-800 overflow-hidden"
           >
             <button
               onClick={() => toggleHint(i)}
               className="flex w-full items-center gap-2 px-2.5 py-2 text-left"
             >
-              <Lightbulb className="h-3.5 w-3.5 shrink-0 text-cyan-400" />
-              <span className="flex-1 text-xs font-medium text-cyan-300">
+              <Lightbulb className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
+              <span className="flex-1 text-xs font-medium text-zinc-300">
                 {hint.title}
               </span>
               {expandedHints.has(i) ? (
-                <ChevronDown className="h-3 w-3 shrink-0 text-cyan-500" />
+                <ChevronDown className="h-3 w-3 shrink-0 text-zinc-500" />
               ) : (
-                <ChevronRight className="h-3 w-3 shrink-0 text-cyan-500" />
+                <ChevronRight className="h-3 w-3 shrink-0 text-zinc-500" />
               )}
             </button>
             {expandedHints.has(i) && (
-              <div className="border-t border-cyan-500/10 px-2.5 py-2">
+              <div className="border-t border-zinc-700 px-2.5 py-2">
                 <p className="text-xs leading-relaxed text-zinc-400">
                   {hint.content}
                 </p>

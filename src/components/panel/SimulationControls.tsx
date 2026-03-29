@@ -36,8 +36,8 @@ export function SimulationControls({ onSimulate }: SimulationControlsProps) {
             onClick={() => setConfig({ requestsPerSec: preset.value })}
             className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
               config.requestsPerSec === preset.value
-                ? "bg-cyan-500/20 text-cyan-400"
-                : "bg-zinc-700/40 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-300"
+                ? "bg-cyan-500/15 text-cyan-500"
+                : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-300"
             }`}
           >
             {preset.label}
@@ -49,7 +49,7 @@ export function SimulationControls({ onSimulate }: SimulationControlsProps) {
         <div>
           <div className="mb-1.5 flex items-center justify-between">
             <label className="text-xs text-zinc-400">Requests/sec</label>
-            <span className="font-mono text-xs text-cyan-400">
+            <span className="font-mono text-xs text-cyan-500">
               {config.requestsPerSec.toLocaleString()}
             </span>
           </div>
@@ -67,12 +67,12 @@ export function SimulationControls({ onSimulate }: SimulationControlsProps) {
             calculation (not a time-series simulation), so durationSec has no effect. */}
       </div>
 
-      <Separator className="bg-zinc-700/40" />
+      <Separator className="bg-zinc-800" />
 
       <Button
         onClick={onSimulate}
         disabled={isRunning}
-        className="w-full gap-2 bg-gradient-to-r from-cyan-500 to-indigo-500 text-white hover:from-cyan-400 hover:to-indigo-400 pulse-glow disabled:opacity-50"
+        className="w-full gap-2 bg-cyan-600 text-white hover:bg-cyan-500 disabled:opacity-50"
         size="sm"
       >
         {isRunning ? (

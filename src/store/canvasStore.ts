@@ -26,15 +26,21 @@ export interface ComponentNodeData {
   [key: string]: unknown;
 }
 
+export interface TextNodeData {
+  text: string;
+  fontSize?: "sm" | "base" | "lg";
+  [key: string]: unknown;
+}
+
 interface CanvasState {
-  nodes: Node<ComponentNodeData>[];
+  nodes: Node[];
   edges: Edge[];
   selectedNodeId: string | null;
 
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
   onConnect: OnConnect;
-  addNode: (node: Node<ComponentNodeData>) => void;
+  addNode: (node: Node) => void;
   setSelectedNode: (id: string | null) => void;
   updateNodeData: (nodeId: string, data: Partial<ComponentNodeData>) => void;
   updateAllNodeData: (
@@ -52,7 +58,7 @@ export const useCanvasStore = create<CanvasState>((set, _get) => ({
 
   onNodesChange: (changes) => {
     set((state) => ({
-      nodes: applyNodeChanges(changes, state.nodes) as Node<ComponentNodeData>[],
+      nodes: applyNodeChanges(changes, state.nodes) as Node[],
     }));
   },
   onEdgesChange: (changes) => {

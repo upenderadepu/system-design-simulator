@@ -30,17 +30,17 @@ export function ProblemSelector() {
             key={problem.id}
             onClick={() => setSelectedProblem(problem.id)}
             aria-pressed={problem.id === selectedProblemId}
-            className={`flex w-full flex-col gap-1.5 rounded-lg px-2.5 py-2 text-left transition-all ${
+            className={`flex w-full flex-col gap-1.5 rounded-md px-2.5 py-2 text-left transition-colors ${
               problem.id === selectedProblemId
-                ? "border border-cyan-500/20 bg-cyan-500/10"
-                : "border border-transparent hover:bg-zinc-800/80"
+                ? "border border-zinc-700 bg-zinc-800"
+                : "border border-transparent hover:bg-zinc-800"
             }`}
           >
             <div className="flex items-center justify-between">
               <span
                 className={`text-xs font-medium ${
                   problem.id === selectedProblemId
-                    ? "text-cyan-300"
+                    ? "text-cyan-500"
                     : "text-zinc-300"
                 }`}
               >

@@ -9,19 +9,19 @@ import { ICON_MAP } from "@/lib/icons";
 
 type ComponentNode = Node<ComponentNodeData, "component">;
 
-const CATEGORY_COLORS: Record<string, { border: string; icon: string; glow: string }> = {
-  networking: { border: "border-blue-500/40", icon: "text-blue-400", glow: "shadow-blue-500/20" },
-  compute: { border: "border-violet-500/40", icon: "text-violet-400", glow: "shadow-violet-500/20" },
-  storage: { border: "border-amber-500/40", icon: "text-amber-400", glow: "shadow-amber-500/20" },
-  messaging: { border: "border-emerald-500/40", icon: "text-emerald-400", glow: "shadow-emerald-500/20" },
-  infrastructure: { border: "border-cyan-500/40", icon: "text-cyan-400", glow: "shadow-cyan-500/20" },
+const CATEGORY_COLORS: Record<string, { border: string; icon: string }> = {
+  networking: { border: "border-zinc-700", icon: "text-blue-400" },
+  compute: { border: "border-zinc-700", icon: "text-violet-400" },
+  storage: { border: "border-zinc-700", icon: "text-amber-400" },
+  messaging: { border: "border-zinc-700", icon: "text-emerald-400" },
+  infrastructure: { border: "border-zinc-700", icon: "text-cyan-400" },
 };
 
-const STATUS_RING: Record<string, string> = {
-  healthy: "ring-emerald-500/60",
-  warning: "ring-amber-500/60",
-  critical: "ring-rose-500/60",
-  idle: "ring-zinc-700/60",
+const STATUS_DOT: Record<string, string> = {
+  healthy: "bg-emerald-500",
+  warning: "bg-amber-500",
+  critical: "bg-rose-500",
+  idle: "bg-zinc-600",
 };
 
 function ComponentNodeInner({ data, selected }: NodeProps<ComponentNode>) {
@@ -29,50 +29,40 @@ function ComponentNodeInner({ data, selected }: NodeProps<ComponentNode>) {
   const Icon = ICON_MAP[nodeData.icon] ?? Server;
   const colors = CATEGORY_COLORS[nodeData.category] ?? CATEGORY_COLORS.compute;
   const status = (nodeData.status as string) ?? "idle";
-  const statusRing = STATUS_RING[status] ?? STATUS_RING.idle;
+  const statusDot = STATUS_DOT[status] ?? STATUS_DOT.idle;
   const isBottleneck = nodeData.isBottleneck ?? false;
   const replicas = nodeData.replicas ?? 1;
   const utilization = nodeData.utilization ?? 0;
 
   return (
-    <motion.div
-      animate={
-        isBottleneck
-          ? {
-              boxShadow: [
-                "0 0 0px rgba(239,68,68,0)",
-                "0 0 20px rgba(239,68,68,0.4)",
-                "0 0 0px rgba(239,68,68,0)",
-              ],
-            }
-          : {}
-      }
-      transition={isBottleneck ? { duration: 1.5, repeat: Infinity } : {}}
+    <div
       className={`
-        relative flex flex-col items-center gap-1.5 rounded-xl border bg-zinc-800/90 px-5 py-4
-        backdrop-blur-sm transition-all duration-200
-        ${colors.border}
-        ${selected ? `ring-2 ring-cyan-400/80 ${colors.glow} shadow-lg` : "shadow-md shadow-black/30"}
-        ${isBottleneck ? "border-rose-500/60" : ""}
+        relative flex flex-col items-center gap-1 rounded-lg border bg-zinc-900 px-4 py-3
+        shadow-sm transition-colors
+        ${isBottleneck ? "border-rose-500/60" : colors.border}
+        ${selected ? "border-cyan-500" : ""}
       `}
     >
       {/* Status indicator dot */}
-      <div className={`absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full ring-2 ${statusRing} ${
-        status === "healthy" ? "bg-emerald-500" :
-        status === "warning" ? "bg-amber-500" :
-        status === "critical" ? "bg-rose-500" : "bg-zinc-600"
-      }`} style={{ animation: status !== 'idle' ? 'status-pulse 2s infinite' : 'none' }} />
+      <div
+        className={`absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full ${statusDot}`}
+        style={{ animation: status !== 'idle' ? 'status-pulse 2s infinite' : 'none' }}
+      />
 
-      {/* Icon */}
-      <div className={`flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-700/50 ${colors.icon}`}>
-        <Icon className="h-4 w-4" />
+      {/* Icon + Label row */}
+      <div className="flex items-center gap-1.5">
+        <div className={`flex h-6 w-6 items-center justify-center rounded ${colors.icon}`}>
+          <Icon className="h-3.5 w-3.5" />
+        </div>
+        <span className="max-w-[80px] truncate text-[11px] font-medium text-zinc-200">
+          {nodeData.label}
+        </span>
       </div>
 
-      {/* Label */}
-      <span className="max-w-[90px] truncate text-[10px] font-medium text-zinc-300">
-        {nodeData.label}
+      {/* Stats */}
+      <span className="font-mono text-[9px] text-zinc-500">
+        {nodeData.maxQPS === Infinity ? '\u221e' : ((nodeData.maxQPS ?? 0)/1000).toFixed(0) + 'k'} qps
       </span>
-      <span className="font-mono text-[8px] text-zinc-400">{nodeData.maxQPS === Infinity ? '∞' : ((nodeData.maxQPS ?? 0)/1000).toFixed(0) + 'k'} qps</span>
 
       {/* Replicas badge */}
       {replicas > 1 && (
@@ -94,7 +84,7 @@ function ComponentNodeInner({ data, selected }: NodeProps<ComponentNode>) {
               transition={{ duration: 0.3 }}
             />
           </div>
-          <span className={`font-mono text-[7px] ${
+          <span className={`font-mono text-[8px] ${
             utilization > 0.8 ? "text-rose-400" : utilization > 0.5 ? "text-amber-400" : "text-emerald-400"
           }`}>{(utilization * 100).toFixed(0)}%</span>
         </div>
@@ -104,14 +94,14 @@ function ComponentNodeInner({ data, selected }: NodeProps<ComponentNode>) {
       <Handle
         type="target"
         position={Position.Left}
-        className="!h-2 !w-2 !rounded-full !border-2 !border-zinc-700 !bg-zinc-500"
+        className="!h-2 !w-2 !rounded-full !border !border-zinc-600 !bg-zinc-400"
       />
       <Handle
         type="source"
         position={Position.Right}
-        className="!h-2 !w-2 !rounded-full !border-2 !border-zinc-700 !bg-zinc-500"
+        className="!h-2 !w-2 !rounded-full !border !border-zinc-600 !bg-zinc-400"
       />
-    </motion.div>
+    </div>
   );
 }
 

@@ -1,26 +1,36 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
-import { ReactFlowProvider } from "@xyflow/react";
+import { useCallback, useEffect, useState } from "react";
+import { ReactFlowProvider, type Node } from "@xyflow/react";
 import { TopBar } from "./top-bar";
 import { Sidebar } from "@/components/sidebar/Sidebar";
 import { RightPanel } from "@/components/panel/RightPanel";
 import { DesignCanvas } from "@/components/canvas/DesignCanvas";
 import { useAppStore } from "@/store/appStore";
-import { useCanvasStore } from "@/store/canvasStore";
+import { useCanvasStore, type ComponentNodeData } from "@/store/canvasStore";
 import { useSimulationStore } from "@/store/simulationStore";
 import { runSimulation } from "@/engine/simulator";
 import { scoreDesign } from "@/scoring/scorer";
 import { Toast } from "@/components/ui/Toast";
+import { SaveDialog } from "@/components/dialogs/SaveDialog";
+import { LoadDialog } from "@/components/dialogs/LoadDialog";
 
 export function AppShell() {
   const leftSidebarOpen = useAppStore((s) => s.leftSidebarOpen);
   const rightPanelOpen = useAppStore((s) => s.rightPanelOpen);
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [loadDialogOpen, setLoadDialogOpen] = useState(false);
+
+  const handleSave = useCallback(() => setSaveDialogOpen(true), []);
+  const handleLoad = useCallback(() => setLoadDialogOpen(true), []);
   const handleSimulate = useCallback(() => {
     const { nodes, edges } = useCanvasStore.getState();
     const { config } = useSimulationStore.getState();
 
-    if (nodes.length === 0) {
+    // Filter out text annotation nodes — they are not part of the system design
+    const componentNodes = nodes.filter((n) => n.type !== "text") as Node<ComponentNodeData>[];
+
+    if (componentNodes.length === 0) {
       useAppStore.getState().showToast("No components to simulate", "info");
       return;
     }
@@ -29,7 +39,7 @@ export function AppShell() {
 
     // Use setTimeout to let React render the "Running..." state
     setTimeout(() => {
-      const result = runSimulation(nodes, edges, config.requestsPerSec);
+      const result = runSimulation(componentNodes, edges, config.requestsPerSec);
 
       // Update node visuals
       const updates = new Map<string, Record<string, unknown>>();
@@ -51,12 +61,15 @@ export function AppShell() {
   const handleScore = useCallback(() => {
     const { nodes, edges } = useCanvasStore.getState();
 
-    if (nodes.length === 0) {
+    // Filter out text annotation nodes — they are not part of the system design
+    const componentNodes = nodes.filter((n) => n.type !== "text") as Node<ComponentNodeData>[];
+
+    if (componentNodes.length === 0) {
       useAppStore.getState().showToast("No components to score", "info");
       return;
     }
 
-    const result = scoreDesign(nodes, edges);
+    const result = scoreDesign(componentNodes, edges);
     useSimulationStore.getState().setScoreResult(result);
     useSimulationStore.getState().setShowScore(true);
     useAppStore.getState().setActiveRightTab("score");
@@ -99,6 +112,18 @@ export function AppShell() {
         handleScore();
       }
 
+      // Ctrl/Cmd + S → save design dialog
+      if (e.key === "s" && (e.metaKey || e.ctrlKey) && !e.shiftKey) {
+        e.preventDefault();
+        setSaveDialogOpen(true);
+      }
+
+      // Ctrl/Cmd + O → load design dialog
+      if (e.key === "o" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setLoadDialogOpen(true);
+      }
+
       // Escape → deselect node
       if (e.key === "Escape") {
         useCanvasStore.getState().setSelectedNode(null);
@@ -112,7 +137,7 @@ export function AppShell() {
   return (
     <ReactFlowProvider>
       <div className="flex h-full flex-col">
-        <TopBar onSimulate={handleSimulate} onScore={handleScore} onClearCanvas={handleClearCanvas} />
+        <TopBar onSimulate={handleSimulate} onScore={handleScore} onClearCanvas={handleClearCanvas} onSave={handleSave} onLoad={handleLoad} />
 
         <div className="flex flex-1 overflow-hidden">
           <Sidebar open={leftSidebarOpen} />
@@ -121,6 +146,9 @@ export function AppShell() {
         </div>
 
         <Toast />
+
+        <SaveDialog open={saveDialogOpen} onClose={() => setSaveDialogOpen(false)} />
+        <LoadDialog open={loadDialogOpen} onClose={() => setLoadDialogOpen(false)} />
       </div>
     </ReactFlowProvider>
   );
