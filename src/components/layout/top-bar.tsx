@@ -24,6 +24,7 @@ import { useAppStore } from "@/store/appStore";
 import { useCanvasStore } from "@/store/canvasStore";
 import { PROBLEMS } from "@/data/problems";
 import { useCustomProblemsStore } from "@/store/customProblemsStore";
+import { useSavedDesignsStore } from "@/store/savedDesignsStore";
 import { type Node, type Edge, useReactFlow } from "@xyflow/react";
 import { getComponentById } from "@/data/components";
 import type { ComponentNodeData } from "@/store/canvasStore";
@@ -121,6 +122,13 @@ export function TopBar({ onSimulate, onScore, onClearCanvas, onSave, onLoad, onS
   const loadReference = useCallback(() => {
     const problem = PROBLEMS.find((p) => p.id === selectedProblemId);
     if (!problem) return;
+
+    const { nodes } = useCanvasStore.getState();
+    if (nodes.length > 0) {
+      // Auto-save current design before overwriting
+      useSavedDesignsStore.getState().saveDesign(`${problem.title} — My Design (auto-saved)`);
+      useAppStore.getState().showToast("Your design was auto-saved before loading reference", "info");
+    }
 
     onClearCanvas();
 
