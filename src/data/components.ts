@@ -309,6 +309,66 @@ export const SYSTEM_COMPONENTS: SystemComponent[] = [
     description:
       "Provides mutual exclusion across distributed systems to prevent race conditions in critical sections like inventory updates, leader election, and distributed transactions. Redis Redlock, Apache ZooKeeper recipes, and etcd lease-based locks are common implementations with trade-offs between safety and liveness.",
   },
+  {
+    id: "circuit-breaker",
+    label: "Circuit Breaker",
+    category: "infrastructure",
+    icon: "ShieldOff",
+    maxQPS: 100000,
+    latencyMs: 1,
+    scalable: true,
+    stateful: true,
+    description:
+      "Prevents cascading failures by monitoring downstream service health and short-circuiting requests when failure rates exceed a threshold. Implements three states: closed (normal), open (failing, reject immediately), and half-open (testing recovery). Netflix Hystrix popularized the pattern; Resilience4j, Envoy, and Istio provide modern implementations.",
+  },
+  {
+    id: "file-store",
+    label: "File Store",
+    category: "storage",
+    icon: "FolderOpen",
+    maxQPS: 10000,
+    latencyMs: 10,
+    scalable: true,
+    stateful: true,
+    description:
+      "Network-attached file storage providing POSIX-compatible file system semantics for shared access across multiple compute instances. Supports hierarchical directories, file locking, and concurrent reads/writes. Amazon EFS, Google Cloud Filestore, and Azure Files are managed options. Use when applications need a traditional file system interface rather than object/blob APIs.",
+  },
+  {
+    id: "origin-shield",
+    label: "Origin Shield",
+    category: "networking",
+    icon: "ShieldCheck",
+    maxQPS: 200000,
+    latencyMs: 5,
+    scalable: true,
+    stateful: false,
+    description:
+      "An additional caching layer between CDN edge locations and the origin server that reduces origin load by collapsing duplicate requests from multiple edge PoPs into a single origin fetch. Reduces origin bandwidth by 50-90% for popular content. AWS CloudFront Origin Shield, Cloudflare Tiered Cache, and Fastly Shield PoPs are implementations.",
+  },
+  {
+    id: "coordination-service",
+    label: "Coordination Service",
+    category: "infrastructure",
+    icon: "Users",
+    maxQPS: 20000,
+    latencyMs: 5,
+    scalable: true,
+    stateful: true,
+    description:
+      "Provides distributed coordination primitives: leader election, configuration management, distributed barriers, and group membership. Built on consensus protocols (Raft/ZAB) for strong consistency. Apache ZooKeeper, etcd, and Consul are the primary implementations. Essential for distributed systems that need agreement on shared state.",
+  },
+  {
+    id: "custom",
+    label: "Custom Component",
+    category: "compute",
+    icon: "Box",
+    maxQPS: 50000,
+    latencyMs: 10,
+    scalable: true,
+    stateful: false,
+    description:
+      "A generic component that can be renamed to represent any service, system, or infrastructure not available in the predefined component library. Double-click the node label on the canvas to rename it. Use this for specialized services like ML inference engines, recommendation services, fraud detection, content moderation, or any domain-specific component.",
+  },
 ];
 
 export const COMPONENT_CATEGORIES = [

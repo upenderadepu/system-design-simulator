@@ -305,7 +305,7 @@ export const PROBLEMS: Problem[] = [
       writesPerSec: 5000,
       storageGB: 1000000,
       latencyMs: 200,
-      users: "2.5B MAU",
+      users: "2.7B MAU",
     },
     constraints: [
       "Videos transcoded into multiple resolutions (360p, 720p, 1080p, 4K) and codecs (H.264, VP9, AV1)",
@@ -718,7 +718,7 @@ export const PROBLEMS: Problem[] = [
     title: "Payment System",
     difficulty: "Hard",
     description:
-      "Design a payment processing platform like Stripe or PayPal. The system handles payment authorization, capture, settlement, refunds, and ledger management with strict financial consistency guarantees. Stripe processes over a trillion dollars annually — the core challenges are ensuring exactly-once payment execution through idempotency keys, maintaining a double-entry accounting ledger, and handling the complex state machine of payment lifecycles across multiple payment processors and methods.",
+      "Design a payment processing platform like Stripe or PayPal. The system handles payment authorization, capture, settlement, refunds, and ledger management with strict financial consistency guarantees. Stripe processes nearly $2 trillion annually — the core challenges are ensuring exactly-once payment execution through idempotency keys, maintaining a double-entry accounting ledger, and handling the complex state machine of payment lifecycles across multiple payment processors and methods.",
     requirements: {
       readsPerSec: 30000,
       writesPerSec: 10000,
@@ -1095,7 +1095,7 @@ export const PROBLEMS: Problem[] = [
     title: "Instagram / Photo Sharing",
     difficulty: "Medium",
     description:
-      "Design a photo and short-video sharing platform like Instagram. Users upload photos that are processed (resized, filtered, compressed), stored across a CDN, and displayed in a personalized feed. Instagram serves over 2 billion monthly active users and processes 100+ million photo uploads daily — the key challenges are building an efficient media processing pipeline, generating a ranked feed from thousands of candidate posts, and serving media globally with minimal latency using edge caching.",
+      "Design a photo and short-video sharing platform like Instagram. Users upload photos that are processed (resized, filtered, compressed), stored across a CDN, and displayed in a personalized feed. Instagram serves over 3 billion monthly active users and processes 100+ million photo uploads daily — the key challenges are building an efficient media processing pipeline, generating a ranked feed from thousands of candidate posts, and serving media globally with minimal latency using edge caching.",
     requirements: {
       readsPerSec: 150000,
       writesPerSec: 20000,
@@ -1177,7 +1177,7 @@ export const PROBLEMS: Problem[] = [
       writesPerSec: 10000,
       storageGB: 500000,
       latencyMs: 200,
-      users: "200M DAU",
+      users: "250M DAU",
     },
     constraints: [
       "Adaptive bitrate audio streaming (96kbps, 160kbps, 320kbps) based on network conditions",
@@ -1479,13 +1479,13 @@ export const PROBLEMS: Problem[] = [
     title: "Netflix / Video Streaming Platform",
     difficulty: "Hard",
     description:
-      "Design a video streaming platform like Netflix that serves personalized content to 250 million subscribers across 190+ countries. Netflix accounts for over 15% of global internet bandwidth during peak hours — the key challenges are building a content recommendation engine that drives 80% of watch time, implementing adaptive bitrate streaming (ABR) that adjusts quality frame-by-frame based on network conditions, and leveraging a global CDN (Open Connect) with ISP-embedded appliances to serve 17,000+ titles with sub-second start times.",
+      "Design a video streaming platform like Netflix that serves personalized content to 325 million subscribers across 190+ countries. Netflix accounts for over 15% of global internet bandwidth during peak hours — the key challenges are building a content recommendation engine that drives 80% of watch time, implementing adaptive bitrate streaming (ABR) that adjusts quality frame-by-frame based on network conditions, and leveraging a global CDN (Open Connect) with ISP-embedded appliances to serve 17,000+ titles with sub-second start times.",
     requirements: {
       readsPerSec: 300000,
       writesPerSec: 5000,
       storageGB: 2000000,
       latencyMs: 100,
-      users: "250M subscribers",
+      users: "325M subscribers",
     },
     constraints: [
       "Adaptive bitrate streaming (ABR) using per-shot encoding — each scene encoded at optimal bitrate/resolution ladder",
@@ -1772,13 +1772,13 @@ export const PROBLEMS: Problem[] = [
     title: "Doordash / Food Delivery",
     difficulty: "Hard",
     description:
-      "Design a food delivery platform like DoorDash or Uber Eats that connects customers, restaurants, and delivery drivers in real-time. DoorDash processes over 500 million orders per quarter across 500,000+ merchant partners — the core challenges are building a real-time dispatch system that optimally matches orders to drivers (considering location, capacity, and estimated completion times), maintaining accurate ETAs that update as conditions change, and handling the three-sided marketplace where restaurant prep times, driver routes, and customer expectations must all be balanced simultaneously.",
+      "Design a food delivery platform like DoorDash or Uber Eats that connects customers, restaurants, and delivery drivers in real-time. DoorDash processes over 750 million orders per quarter across 500,000+ merchant partners — the core challenges are building a real-time dispatch system that optimally matches orders to drivers (considering location, capacity, and estimated completion times), maintaining accurate ETAs that update as conditions change, and handling the three-sided marketplace where restaurant prep times, driver routes, and customer expectations must all be balanced simultaneously.",
     requirements: {
       readsPerSec: 80000,
       writesPerSec: 40000,
       storageGB: 50000,
       latencyMs: 200,
-      users: "37M MAU",
+      users: "46M MAU",
     },
     constraints: [
       "Real-time order tracking with GPS updates every 5 seconds from active delivery drivers",
@@ -1845,13 +1845,13 @@ export const PROBLEMS: Problem[] = [
     title: "Reddit / Social News",
     difficulty: "Medium",
     description:
-      "Design a social news aggregation and discussion platform like Reddit. Users submit posts to topic-based communities (subreddits), vote content up or down, and engage in deeply nested comment threads. Reddit serves 73+ million daily active users across 100,000+ active communities — the key challenges are implementing a ranking algorithm (hot, top, controversial, best) that surfaces quality content across communities of vastly different sizes, efficiently storing and rendering deeply nested comment trees with thousands of replies, and building a moderation system that scales across volunteer moderators.",
+      "Design a social news aggregation and discussion platform like Reddit. Users submit posts to topic-based communities (subreddits), vote content up or down, and engage in deeply nested comment threads. Reddit serves 97+ million daily active users across 100,000+ active communities — the key challenges are implementing a ranking algorithm (hot, top, controversial, best) that surfaces quality content across communities of vastly different sizes, efficiently storing and rendering deeply nested comment trees with thousands of replies, and building a moderation system that scales across volunteer moderators.",
     requirements: {
       readsPerSec: 200000,
       writesPerSec: 20000,
       storageGB: 200000,
       latencyMs: 200,
-      users: "73M DAU",
+      users: "97M DAU",
     },
     constraints: [
       "Multiple ranking algorithms: hot (time-decayed score), top (by time window), controversial (balanced up/down), best (Wilson score)",
@@ -1993,13 +1993,13 @@ export const PROBLEMS: Problem[] = [
     title: "WhatsApp / Messaging",
     difficulty: "Hard",
     description:
-      "Design an end-to-end encrypted messaging platform like WhatsApp that handles 100+ billion messages per day across 2 billion monthly active users. The server never sees plaintext message content — the core challenges are implementing the Signal Protocol for end-to-end encryption with perfect forward secrecy, reliably delivering messages to offline users (store-and-forward), efficiently fanning out messages in group chats (up to 1024 members), and synchronizing message state across multiple linked devices while maintaining encryption guarantees.",
+      "Design an end-to-end encrypted messaging platform like WhatsApp that handles 100+ billion messages per day across 3 billion monthly active users. The server never sees plaintext message content — the core challenges are implementing the Signal Protocol for end-to-end encryption with perfect forward secrecy, reliably delivering messages to offline users (store-and-forward), efficiently fanning out messages in group chats (up to 1024 members), and synchronizing message state across multiple linked devices while maintaining encryption guarantees.",
     requirements: {
       readsPerSec: 100000,
       writesPerSec: 1000000,
       storageGB: 500000,
       latencyMs: 50,
-      users: "2B MAU, 500M DAU",
+      users: "3B MAU",
     },
     constraints: [
       "End-to-end encryption using Signal Protocol — server stores only ciphertext, key exchange via X3DH (Extended Triple Diffie-Hellman)",
@@ -2137,13 +2137,13 @@ export const PROBLEMS: Problem[] = [
     title: "Yelp / Location-Based Service",
     difficulty: "Medium",
     description:
-      "Design a location-based business discovery and review platform like Yelp or Google Places. Users search for businesses by category and proximity, browse photos and reviews, and contribute their own ratings. Yelp indexes over 250 million reviews for 5+ million businesses — the core challenges are building an efficient geospatial index (QuadTree or Geohash) that supports proximity search with category filters, aggregating review scores in real-time as new reviews come in, and serving business detail pages with rich media from a global CDN.",
+      "Design a location-based business discovery and review platform like Yelp or Google Places. Users search for businesses by category and proximity, browse photos and reviews, and contribute their own ratings. Yelp indexes over 330 million reviews for 7+ million businesses — the core challenges are building an efficient geospatial index (QuadTree or Geohash) that supports proximity search with category filters, aggregating review scores in real-time as new reviews come in, and serving business detail pages with rich media from a global CDN.",
     requirements: {
       readsPerSec: 100000,
       writesPerSec: 5000,
       storageGB: 50000,
       latencyMs: 200,
-      users: "33M MAU",
+      users: "33M monthly unique visitors",
     },
     constraints: [
       "Geospatial search using QuadTree or Geohash index — find businesses within radius sorted by relevance and distance",
@@ -2344,7 +2344,7 @@ export const PROBLEMS: Problem[] = [
     title: "Digital Wallet / UPI",
     difficulty: "Hard",
     description:
-      "Design a digital wallet and P2P payment system like Google Pay, PayTM, or UPI (Unified Payments Interface). India's UPI network processes over 10 billion transactions per month across 350+ banks — the core challenges are maintaining strict financial consistency with double-entry bookkeeping, achieving exactly-once transaction execution through idempotency keys (critical when network timeouts cause retries), implementing distributed locks for concurrent balance updates, and meeting regulatory requirements for transaction audit trails, KYC compliance, and settlement reconciliation with banking partners.",
+      "Design a digital wallet and P2P payment system like Google Pay, PayTM, or UPI (Unified Payments Interface). India's UPI network processes over 16 billion transactions per month across 600+ banks — the core challenges are maintaining strict financial consistency with double-entry bookkeeping, achieving exactly-once transaction execution through idempotency keys (critical when network timeouts cause retries), implementing distributed locks for concurrent balance updates, and meeting regulatory requirements for transaction audit trails, KYC compliance, and settlement reconciliation with banking partners.",
     requirements: {
       readsPerSec: 50000,
       writesPerSec: 30000,

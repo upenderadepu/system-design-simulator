@@ -177,7 +177,7 @@ export const CONCEPT_LIBRARY: Record<string, ComponentConcept> = {
       { name: "Fixed Window Counter", description: "Count requests per fixed time window — simple but allows burst at window boundaries" },
     ],
     realWorldExamples: [
-      "GitHub API enforces 5,000 requests/hour per authenticated user with token bucket",
+      "GitHub API enforces 5,000 requests/hour per authenticated user",
       "Stripe rate limits API requests per second per key with graceful 429 responses",
       "Cloudflare rate limiting protects millions of websites from L7 DDoS attacks",
     ],
@@ -282,7 +282,7 @@ export const CONCEPT_LIBRARY: Record<string, ComponentConcept> = {
     ],
     realWorldExamples: [
       "Instagram uses PostgreSQL with extensive sharding to store billions of user records",
-      "Shopify shards MySQL across thousands of instances using application-level routing",
+      "Shopify shards MySQL across hundreds of instances using application-level routing",
       "Stripe uses PostgreSQL for financial transactions requiring strict ACID guarantees",
     ],
   },
@@ -369,7 +369,7 @@ export const CONCEPT_LIBRARY: Record<string, ComponentConcept> = {
       "Low-latency key-value lookups — S3 GET latency is ~100ms, too slow for hot path",
     ],
     keyTradeoffs: [
-      "High durability but eventual consistency for overwrites (S3 now provides strong read-after-write consistency)",
+      "S3 historically had eventual consistency but now provides strong read-after-write consistency for all operations since December 2020",
       "Cost-effective for storage but egress bandwidth costs can be significant at scale",
       "No append or partial update — must rewrite entire object for any change",
       "Performance: S3 supports 5,500 GETs and 3,500 PUTs per prefix per second — prefix design matters",
@@ -422,7 +422,7 @@ export const CONCEPT_LIBRARY: Record<string, ComponentConcept> = {
     realWorldExamples: [
       "Wikipedia uses Elasticsearch (CirrusSearch) to power search across 60M+ articles in 300 languages",
       "Uber uses Elasticsearch for searching across drivers, riders, trips, and support tickets",
-      "GitHub uses Elasticsearch to search across 200M+ repositories of source code",
+      "GitHub built a custom code search engine to search across 200M+ repositories, replacing an earlier Elasticsearch-based system",
     ],
   },
   "message-queue": {
@@ -526,7 +526,7 @@ export const CONCEPT_LIBRARY: Record<string, ComponentConcept> = {
     realWorldExamples: [
       "Google SRE invented the four golden signals (latency, traffic, errors, saturation) for monitoring",
       "Uber uses Jaeger (which they created) for distributed tracing across thousands of microservices",
-      "Netflix uses Atlas for real-time metrics processing handling 2.5 billion+ data points per minute",
+      "Netflix uses Atlas for real-time metrics processing handling billions of data points per minute",
     ],
   },
   "websocket-server": {
@@ -561,7 +561,7 @@ export const CONCEPT_LIBRARY: Record<string, ComponentConcept> = {
     realWorldExamples: [
       "Slack uses WebSockets for real-time message delivery to millions of concurrent users",
       "Discord maintains millions of concurrent WebSocket connections with Elixir/Rust",
-      "Figma uses WebSockets for real-time collaborative design with operational transforms",
+      "Figma uses WebSockets for real-time collaborative design with a custom CRDT-inspired multiplayer system",
     ],
   },
   "task-scheduler": {
@@ -595,7 +595,7 @@ export const CONCEPT_LIBRARY: Record<string, ComponentConcept> = {
     ],
     realWorldExamples: [
       "Airbnb uses Apache Airflow to orchestrate thousands of data pipeline DAGs daily",
-      "Uber built Cadence (now Temporal) for durable, long-running workflow orchestration",
+      "Uber built Cadence (Temporal is a separate fork by its original creators) for durable, long-running workflow orchestration",
       "Stripe uses custom task scheduling for delayed payment retries and webhook delivery",
     ],
   },
@@ -736,7 +736,7 @@ export const CONCEPT_LIBRARY: Record<string, ComponentConcept> = {
     realWorldExamples: [
       "Prometheus TSDB powers monitoring at most Kubernetes-based organizations",
       "Uber uses M3DB (their custom time-series DB) for billions of metrics per second",
-      "InfluxDB is used by Tesla for IoT telemetry from their vehicle fleet",
+      "Cloudflare uses a time-series database for network edge telemetry across 300+ data centers",
     ],
   },
   "data-warehouse": {

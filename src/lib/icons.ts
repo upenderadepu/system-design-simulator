@@ -24,6 +24,11 @@ import {
   Compass,
   Shield,
   Lock,
+  ShieldOff,
+  FolderOpen,
+  ShieldCheck,
+  Users,
+  Box,
 } from "lucide-react";
 
 export const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -52,4 +57,9 @@ export const ICON_MAP: Record<string, React.ComponentType<{ className?: string }
   Compass,
   Shield,
   Lock,
+  ShieldOff,
+  FolderOpen,
+  ShieldCheck,
+  Users,
+  Box,
 };

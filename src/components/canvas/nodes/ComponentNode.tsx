@@ -1,9 +1,10 @@
 "use client";
 
-import { memo } from "react";
-import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
+import { memo, useState, useCallback, useRef, useEffect } from "react";
+import { Handle, Position, type NodeProps, type Node, useReactFlow } from "@xyflow/react";
 import { motion } from "framer-motion";
 import type { ComponentNodeData } from "@/store/canvasStore";
+import { useCanvasStore } from "@/store/canvasStore";
 import { Server } from "lucide-react";
 import { ICON_MAP } from "@/lib/icons";
 
@@ -24,7 +25,7 @@ const STATUS_DOT: Record<string, string> = {
   idle: "bg-zinc-600",
 };
 
-function ComponentNodeInner({ data, selected }: NodeProps<ComponentNode>) {
+function ComponentNodeInner({ id, data, selected }: NodeProps<ComponentNode>) {
   const nodeData = data;
   const Icon = ICON_MAP[nodeData.icon] ?? Server;
   const colors = CATEGORY_COLORS[nodeData.category] ?? CATEGORY_COLORS.compute;
@@ -33,6 +34,35 @@ function ComponentNodeInner({ data, selected }: NodeProps<ComponentNode>) {
   const isBottleneck = nodeData.isBottleneck ?? false;
   const replicas = nodeData.replicas ?? 1;
   const utilization = nodeData.utilization ?? 0;
+
+  const isCustom = nodeData.componentId === "custom";
+  const [editing, setEditing] = useState(false);
+  const [editLabel, setEditLabel] = useState(nodeData.label);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const updateNodeData = useCanvasStore((s) => s.updateNodeData);
+
+  useEffect(() => {
+    if (editing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [editing]);
+
+  const commitLabel = useCallback(() => {
+    const trimmed = editLabel.trim();
+    if (trimmed && trimmed !== nodeData.label) {
+      updateNodeData(id, { label: trimmed });
+    } else {
+      setEditLabel(nodeData.label);
+    }
+    setEditing(false);
+  }, [editLabel, nodeData.label, id, updateNodeData]);
+
+  const handleDoubleClick = useCallback(() => {
+    if (!isCustom) return;
+    setEditLabel(nodeData.label);
+    setEditing(true);
+  }, [isCustom, nodeData.label]);
 
   return (
     <div
@@ -54,9 +84,29 @@ function ComponentNodeInner({ data, selected }: NodeProps<ComponentNode>) {
         <div className={`flex h-6 w-6 items-center justify-center rounded ${colors.icon}`}>
           <Icon className="h-3.5 w-3.5" />
         </div>
-        <span className="max-w-[80px] truncate text-[11px] font-medium text-zinc-200">
-          {nodeData.label}
-        </span>
+        {editing ? (
+          <input
+            ref={inputRef}
+            value={editLabel}
+            onChange={(e) => setEditLabel(e.target.value)}
+            onBlur={commitLabel}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") commitLabel();
+              if (e.key === "Escape") {
+                setEditLabel(nodeData.label);
+                setEditing(false);
+              }
+            }}
+            className="max-w-[80px] bg-transparent text-[11px] font-medium text-zinc-200 outline-none border-b border-cyan-500"
+          />
+        ) : (
+          <span
+            className={`max-w-[80px] truncate text-[11px] font-medium text-zinc-200 ${isCustom ? "cursor-text" : ""}`}
+            onDoubleClick={handleDoubleClick}
+          >
+            {nodeData.label}
+          </span>
+        )}
       </div>
 
       {/* Stats */}
