@@ -216,6 +216,8 @@ export function TopBar({ onSimulate, onScore, onClearCanvas, onSave, onLoad, onS
                     onClick={() => {
                       setSelectedProblem(problem.id);
                       setDropdownOpen(false);
+                      // Auto-load reference solution when selecting a problem
+                      setTimeout(() => loadReference(), 50);
                     }}
                     className={`flex w-full items-center px-3 py-1.5 text-left text-xs transition-colors hover:bg-zinc-700 ${
                       problem.id === selectedProblemId

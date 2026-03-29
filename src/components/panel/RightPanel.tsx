@@ -47,38 +47,15 @@ export function RightPanel({ open, onSimulate }: RightPanelProps) {
       ) : (
       <div className="flex w-[300px] flex-1 flex-col">
         <Tabs value={activeRightTab} onValueChange={(v) => setActiveRightTab(v as typeof activeRightTab)} className="flex flex-1 flex-col">
-          <TabsList className="mx-2 mt-2 h-8 w-auto shrink-0 bg-zinc-800">
-            <TabsTrigger
-              value="properties"
-              className="h-7 px-3 text-xs data-[state=active]:bg-zinc-700 data-[state=active]:text-zinc-100"
-            >
-              Properties
-            </TabsTrigger>
-            <TabsTrigger
-              value="simulation"
-              className="h-7 px-3 text-xs data-[state=active]:bg-zinc-700 data-[state=active]:text-zinc-100"
-            >
-              Simulate
-            </TabsTrigger>
-            <TabsTrigger
-              value="score"
-              className="h-7 px-3 text-xs data-[state=active]:bg-zinc-700 data-[state=active]:text-zinc-100"
-            >
-              Score
-            </TabsTrigger>
-            <TabsTrigger
-              value="capacity"
-              className="h-7 px-3 text-xs data-[state=active]:bg-zinc-700 data-[state=active]:text-zinc-100"
-            >
-              Capacity
-            </TabsTrigger>
-            <TabsTrigger
-              value="tradeoffs"
-              className="h-7 px-3 text-xs data-[state=active]:bg-zinc-700 data-[state=active]:text-zinc-100"
-            >
-              Trade-offs
-            </TabsTrigger>
-          </TabsList>
+          <div className="mx-2 mt-2 shrink-0 overflow-x-auto">
+            <TabsList className="h-8 w-max bg-zinc-800">
+              <TabsTrigger value="properties" className="h-7 px-2 text-[11px] data-[state=active]:bg-zinc-700 data-[state=active]:text-zinc-100">Props</TabsTrigger>
+              <TabsTrigger value="simulation" className="h-7 px-2 text-[11px] data-[state=active]:bg-zinc-700 data-[state=active]:text-zinc-100">Simulate</TabsTrigger>
+              <TabsTrigger value="score" className="h-7 px-2 text-[11px] data-[state=active]:bg-zinc-700 data-[state=active]:text-zinc-100">Score</TabsTrigger>
+              <TabsTrigger value="capacity" className="h-7 px-2 text-[11px] data-[state=active]:bg-zinc-700 data-[state=active]:text-zinc-100">Capacity</TabsTrigger>
+              <TabsTrigger value="tradeoffs" className="h-7 px-2 text-[11px] data-[state=active]:bg-zinc-700 data-[state=active]:text-zinc-100">Trade-offs</TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="properties" className="mt-0 flex-1 overflow-hidden">
             <ScrollArea className="h-full">

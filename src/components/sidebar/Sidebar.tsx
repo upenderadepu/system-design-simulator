@@ -41,15 +41,15 @@ export function Sidebar({ open }: SidebarProps) {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="components" className="mt-0 flex-1 overflow-hidden">
+          <TabsContent value="components" className="mt-0 flex-1 overflow-y-auto">
             <ComponentPalette />
           </TabsContent>
 
-          <TabsContent value="problems" className="mt-0 flex-1 overflow-hidden">
+          <TabsContent value="problems" className="mt-0 flex-1 overflow-y-auto">
             <ProblemSelector />
           </TabsContent>
 
-          <TabsContent value="learn" className="mt-0 flex-1 overflow-hidden">
+          <TabsContent value="learn" className="mt-0 flex-1 overflow-y-auto">
             <LearningPath />
           </TabsContent>
         </Tabs>
