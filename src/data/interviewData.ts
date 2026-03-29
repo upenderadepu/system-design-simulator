@@ -112,7 +112,7 @@ export const INTERVIEW_DATA: ProblemInterviewData[] = [
     ],
     estimationHints: {
       dailyActiveUsers: "100M DAU, each triggering ~1 redirect/day = 100M reads/day",
-      readWriteRatio: "100:1 — 100K reads/sec vs 1K writes/sec",
+      readWriteRatio: "100:1 read/write ratio, ~1K writes/sec, ~100K reads/sec at peak (with caching)",
       storagePerItem: "~500 bytes per URL record; 1K new URLs/sec = 86M/day = ~43 GB/year",
       peakMultiplier: "3x average during business hours (US + EU overlap)",
     },
@@ -279,7 +279,7 @@ export const INTERVIEW_DATA: ProblemInterviewData[] = [
     ],
     estimationHints: {
       dailyActiveUsers: "200M DAU, average 40 messages sent/day per user = 8B messages/day",
-      readWriteRatio: "~1:2 write-heavy — more messages sent than conversation list views",
+      readWriteRatio: "~2:1 write-heavy (writes exceed reads) — more messages sent than conversation list views",
       storagePerItem: "~200 bytes per message; 8B messages/day = 1.6 TB/day",
       peakMultiplier: "2x average during evening hours (6-10 PM local time)",
     },

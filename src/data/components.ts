@@ -24,7 +24,7 @@ export const SYSTEM_COMPONENTS: SystemComponent[] = [
     scalable: true,
     stateful: false,
     description:
-      "Content Delivery Network — caches static assets (images, JS, CSS, videos) at edge locations close to users, reducing latency from hundreds of milliseconds to single digits. Essential for any read-heavy or media-heavy system serving a global audience. Examples include Amazon CloudFront, Google Cloud CDN, and Cloudflare.",
+      "Content Delivery Network — caches static assets (images, JS, CSS, videos) at edge locations close to users, reducing latency from hundreds of milliseconds to low double digits. Essential for any read-heavy or media-heavy system serving a global audience. Examples include Amazon CloudFront, Google Cloud CDN, and Cloudflare.",
   },
   {
     id: "load-balancer",
@@ -219,7 +219,7 @@ export const SYSTEM_COMPONENTS: SystemComponent[] = [
     maxQPS: 200000,
     latencyMs: 10,
     scalable: true,
-    stateful: false,
+    stateful: true,
     description:
       "Processes continuous data streams in real-time for analytics, event processing, and ETL pipelines. Handles windowed aggregations, joins, and transformations on unbounded data. Apache Kafka Streams, Apache Flink, Spark Streaming, and AWS Kinesis Data Analytics are industry standards.",
   },

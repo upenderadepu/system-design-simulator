@@ -79,7 +79,7 @@ export const PROBLEMS: Problem[] = [
       writesPerSec: 1000,
       storageGB: 500000,
       latencyMs: 200,
-      users: "500M DAU",
+      users: "250M DAU",
     },
     constraints: [
       "Timeline should be eventually consistent within 5 seconds of a new post",
@@ -154,9 +154,9 @@ export const PROBLEMS: Problem[] = [
     requirements: {
       readsPerSec: 50000,
       writesPerSec: 100000,
-      storageGB: 2000,
+      storageGB: 50000,
       latencyMs: 50,
-      users: "200M DAU",
+      users: "500M DAU",
     },
     constraints: [
       "Messages delivered in under 50ms for online users via persistent WebSocket connections",
@@ -234,7 +234,7 @@ export const PROBLEMS: Problem[] = [
     },
     constraints: [
       "Driver matching within 5 seconds using geospatial proximity search",
-      "Location updates every 3 seconds from all active drivers (~1M concurrent drivers)",
+      "Location updates every 4 seconds from all active drivers (~1M concurrent drivers)",
       "ETA accuracy within 20% of actual using real-time traffic and historical data",
       "Surge pricing computed in real-time per geo zone based on supply/demand ratios",
       "Trip history and receipts stored permanently for regulatory compliance",
@@ -260,7 +260,7 @@ export const PROBLEMS: Problem[] = [
       {
         title: "Advanced: Geohash sharding",
         content:
-          "Partition your driver location data by geohash prefix so each shard handles a geographic region. This lets proximity queries hit a single shard instead of scanning globally. Use Redis Geo commands (GEOADD/GEORADIUS) for O(log N) nearest-neighbor lookups.",
+          "Partition your driver location data by geohash prefix so each shard handles a geographic region. This lets proximity queries hit a single shard instead of scanning globally. Use Redis Geo commands (GEOADD/GEOSEARCH) for O(log N) nearest-neighbor lookups.",
       },
     ],
     referenceSolution: {
@@ -305,7 +305,7 @@ export const PROBLEMS: Problem[] = [
       writesPerSec: 5000,
       storageGB: 1000000,
       latencyMs: 200,
-      users: "1B DAU",
+      users: "2.5B MAU",
     },
     constraints: [
       "Videos transcoded into multiple resolutions (360p, 720p, 1080p, 4K) and codecs (H.264, VP9, AV1)",
@@ -349,6 +349,7 @@ export const PROBLEMS: Problem[] = [
         { componentId: "app-server", x: 500, y: 250 },
         { componentId: "cache", x: 500, y: 100 },
         { componentId: "message-queue", x: 500, y: 400 },
+        { componentId: "stream-processor", x: 600, y: 400 },
         { componentId: "object-storage", x: 700, y: 100 },
         { componentId: "sql-db", x: 700, y: 250 },
         { componentId: "search", x: 700, y: 400 },
@@ -365,7 +366,8 @@ export const PROBLEMS: Problem[] = [
         { source: "app-server", target: "cache" },
         { source: "app-server", target: "message-queue" },
         { source: "app-server", target: "sql-db" },
-        { source: "message-queue", target: "object-storage" },
+        { source: "message-queue", target: "stream-processor" },
+        { source: "stream-processor", target: "object-storage" },
         { source: "app-server", target: "search" },
         { source: "app-server", target: "monitoring" },
       ],
@@ -377,7 +379,7 @@ export const PROBLEMS: Problem[] = [
     title: "Rate Limiter",
     difficulty: "Easy",
     description:
-      "Design a distributed rate limiting service that throttles API requests per client, IP, or API key. Real systems like Cloudflare and AWS WAF use token bucket or sliding window algorithms backed by distributed counters in Redis. The key challenge is achieving consistency across multiple rate limiter instances without adding significant latency to the request path — Stripe processes millions of API calls per minute while enforcing per-key rate limits with sub-millisecond overhead.",
+      "Design a distributed rate limiting service that throttles API requests per client, IP, or API key. Real systems like Cloudflare and AWS WAF use token bucket or sliding window algorithms backed by distributed counters in Redis. The key challenge is achieving consistency across multiple rate limiter instances without adding significant latency to the request path — Stripe processes hundreds of millions of API calls per day while enforcing per-key rate limits with sub-millisecond overhead.",
     requirements: {
       readsPerSec: 50000,
       writesPerSec: 50000,
@@ -442,7 +444,7 @@ export const PROBLEMS: Problem[] = [
     title: "Notification System",
     difficulty: "Medium",
     description:
-      "Design a scalable notification service like Firebase Cloud Messaging or AWS SNS that delivers push notifications, emails, and SMS to hundreds of millions of users. The system must handle priority-based routing, template rendering, delivery tracking, and retry logic across multiple channels. Real platforms like WhatsApp process over 100 billion messages daily — the key challenges are fan-out at scale, rate limiting per channel, and maintaining delivery guarantees without overwhelming downstream providers.",
+      "Design a scalable notification service like Firebase Cloud Messaging or AWS SNS that delivers push notifications, emails, and SMS to hundreds of millions of users. The system must handle priority-based routing, template rendering, delivery tracking, and retry logic across multiple channels. Firebase Cloud Messaging delivers over 1 trillion push notifications per year — the key challenges are fan-out at scale, rate limiting per channel, and maintaining delivery guarantees without overwhelming downstream providers.",
     requirements: {
       readsPerSec: 50000,
       writesPerSec: 100000,
@@ -519,7 +521,7 @@ export const PROBLEMS: Problem[] = [
       writesPerSec: 5000,
       storageGB: 100,
       latencyMs: 50,
-      users: "1B queries/day",
+      users: "17B queries/day",
     },
     constraints: [
       "Response time under 50ms at p99 — suggestions must appear as the user types each character",
@@ -583,7 +585,7 @@ export const PROBLEMS: Problem[] = [
     title: "Web Crawler",
     difficulty: "Medium",
     description:
-      "Design a distributed web crawler like Googlebot that can crawl billions of web pages efficiently. The crawler must manage a URL frontier, respect robots.txt politeness policies, deduplicate content, and handle the enormous variety of web page structures. Google's crawler discovers and indexes over 100 billion pages — the key design decisions involve URL prioritization, politeness (not overwhelming any single domain), and distributed coordination to avoid redundant crawls.",
+      "Design a distributed web crawler like Googlebot that can crawl billions of web pages efficiently. The crawler must manage a URL frontier, respect robots.txt politeness policies, deduplicate content, and handle the enormous variety of web page structures. Google's crawler discovers and indexes trillions of URLs and maintains an index of over 400 billion pages — the key design decisions involve URL prioritization, politeness (not overwhelming any single domain), and distributed coordination to avoid redundant crawls.",
     requirements: {
       readsPerSec: 10000,
       writesPerSec: 50000,
@@ -651,7 +653,7 @@ export const PROBLEMS: Problem[] = [
     title: "Distributed Cache",
     difficulty: "Medium",
     description:
-      "Design a distributed in-memory caching system like Redis or Memcached. The system must support key-value storage with sub-millisecond reads, consistent hashing for data distribution, multiple eviction policies, and replication for fault tolerance. Redis serves over 1 million requests per second per node — the key challenges are maintaining cache coherence across nodes, handling hot keys that receive disproportionate traffic, and designing a partition strategy that minimizes data movement during scaling events.",
+      "Design a distributed in-memory caching system like Redis or Memcached. The system must support key-value storage with sub-millisecond reads, consistent hashing for data distribution, multiple eviction policies, and replication for fault tolerance. Redis can serve hundreds of thousands to over 1 million requests per second per node on optimized hardware — the key challenges are maintaining cache coherence across nodes, handling hot keys that receive disproportionate traffic, and designing a partition strategy that minimizes data movement during scaling events.",
     requirements: {
       readsPerSec: 500000,
       writesPerSec: 100000,
@@ -716,7 +718,7 @@ export const PROBLEMS: Problem[] = [
     title: "Payment System",
     difficulty: "Hard",
     description:
-      "Design a payment processing platform like Stripe or PayPal. The system handles payment authorization, capture, settlement, refunds, and ledger management with strict financial consistency guarantees. Stripe processes hundreds of billions of dollars annually — the core challenges are ensuring exactly-once payment execution through idempotency keys, maintaining a double-entry accounting ledger, and handling the complex state machine of payment lifecycles across multiple payment processors and methods.",
+      "Design a payment processing platform like Stripe or PayPal. The system handles payment authorization, capture, settlement, refunds, and ledger management with strict financial consistency guarantees. Stripe processes over a trillion dollars annually — the core challenges are ensuring exactly-once payment execution through idempotency keys, maintaining a double-entry accounting ledger, and handling the complex state machine of payment lifecycles across multiple payment processors and methods.",
     requirements: {
       readsPerSec: 30000,
       writesPerSec: 10000,
@@ -955,7 +957,7 @@ export const PROBLEMS: Problem[] = [
       writesPerSec: 20000,
       storageGB: 1000000,
       latencyMs: 500,
-      users: "500M DAU",
+      users: "700M registered users",
     },
     constraints: [
       "Block-level chunking (4MB blocks) with content-addressable storage for deduplication",
@@ -1025,7 +1027,7 @@ export const PROBLEMS: Problem[] = [
     title: "Parking Lot System",
     difficulty: "Easy",
     description:
-      "Design a smart parking lot management system that tracks vehicle entry/exit, manages spot availability in real-time, handles reservations, and processes payments. Modern smart parking systems like ParkMobile and SpotHero serve millions of daily transactions — the key challenges are maintaining accurate real-time availability across multiple lots, handling concurrent reservation requests for the same spot, and integrating with IoT sensors for automatic occupancy detection.",
+      "Design a smart parking lot management system that tracks vehicle entry/exit, manages spot availability in real-time, handles reservations, and processes payments. Modern smart parking systems like ParkMobile and SpotHero serve hundreds of millions of annual transactions — the key challenges are maintaining accurate real-time availability across multiple lots, handling concurrent reservation requests for the same spot, and integrating with IoT sensors for automatic occupancy detection.",
     requirements: {
       readsPerSec: 5000,
       writesPerSec: 2000,
@@ -1169,7 +1171,7 @@ export const PROBLEMS: Problem[] = [
     title: "Spotify / Music Streaming",
     difficulty: "Medium",
     description:
-      "Design a music streaming platform like Spotify that serves audio content to millions of concurrent listeners, manages a catalog of 100M+ tracks, generates personalized playlists, and supports offline downloads. Spotify streams over 4 billion minutes of audio daily — the key challenges are optimizing audio delivery with adaptive bitrate streaming, building a recommendation engine from listening history, and managing music licensing and royalty tracking for artists.",
+      "Design a music streaming platform like Spotify that serves audio content to millions of concurrent listeners, manages a catalog of 100M+ tracks, generates personalized playlists, and supports offline downloads. Spotify streams billions of minutes of audio daily — the key challenges are optimizing audio delivery with adaptive bitrate streaming, building a recommendation engine from listening history, and managing music licensing and royalty tracking for artists.",
     requirements: {
       readsPerSec: 100000,
       writesPerSec: 10000,
@@ -1245,13 +1247,13 @@ export const PROBLEMS: Problem[] = [
     title: "Amazon / E-Commerce",
     difficulty: "Hard",
     description:
-      "Design a large-scale e-commerce platform like Amazon. The system handles product catalog management with millions of SKUs, shopping cart persistence, inventory tracking across warehouses, order processing, and personalized recommendations. Amazon processes over 300 million active customer accounts and handles over 12 million orders per hour during peak events like Prime Day — the central challenges are maintaining inventory consistency across concurrent purchases, building a low-latency product search, and orchestrating the complex order fulfillment pipeline.",
+      "Design a large-scale e-commerce platform like Amazon. The system handles product catalog management with millions of SKUs, shopping cart persistence, inventory tracking across warehouses, order processing, and personalized recommendations. Amazon processes over 300 million active customer accounts and handles millions of orders per hour during peak events like Prime Day — the central challenges are maintaining inventory consistency across concurrent purchases, building a low-latency product search, and orchestrating the complex order fulfillment pipeline.",
     requirements: {
       readsPerSec: 200000,
       writesPerSec: 50000,
       storageGB: 20000,
       latencyMs: 200,
-      users: "300M DAU",
+      users: "300M active accounts",
     },
     constraints: [
       "Product catalog with 100M+ SKUs, each with variants (size, color), pricing tiers, and seller information",
@@ -1325,7 +1327,7 @@ export const PROBLEMS: Problem[] = [
     title: "Slack / Team Messaging",
     difficulty: "Hard",
     description:
-      "Design a workspace-based team messaging platform like Slack or Microsoft Teams. The system supports organized channels, threaded conversations, direct messages, file sharing, search across message history, and integrations with third-party services. Slack handles tens of millions of daily active users across millions of workspaces — the key challenges are maintaining message ordering and delivery guarantees across channels, building a fast full-text search index over billions of messages, and managing the complex permission model of workspaces, channels, and threads.",
+      "Design a workspace-based team messaging platform like Slack or Microsoft Teams. The system supports organized channels, threaded conversations, direct messages, file sharing, search across message history, and integrations with third-party services. Slack handles tens of millions of daily active users across hundreds of thousands of workspaces — the key challenges are maintaining message ordering and delivery guarantees across channels, building a fast full-text search index over billions of messages, and managing the complex permission model of workspaces, channels, and threads.",
     requirements: {
       readsPerSec: 100000,
       writesPerSec: 30000,
@@ -1477,13 +1479,13 @@ export const PROBLEMS: Problem[] = [
     title: "Netflix / Video Streaming Platform",
     difficulty: "Hard",
     description:
-      "Design a video streaming platform like Netflix that serves personalized content to 250 million daily active users across 190+ countries. Netflix accounts for over 15% of global internet bandwidth during peak hours — the key challenges are building a content recommendation engine that drives 80% of watch time, implementing adaptive bitrate streaming (ABR) that adjusts quality frame-by-frame based on network conditions, and leveraging a global CDN (Open Connect) with ISP-embedded appliances to serve 17,000+ titles with sub-second start times.",
+      "Design a video streaming platform like Netflix that serves personalized content to 250 million subscribers across 190+ countries. Netflix accounts for over 15% of global internet bandwidth during peak hours — the key challenges are building a content recommendation engine that drives 80% of watch time, implementing adaptive bitrate streaming (ABR) that adjusts quality frame-by-frame based on network conditions, and leveraging a global CDN (Open Connect) with ISP-embedded appliances to serve 17,000+ titles with sub-second start times.",
     requirements: {
       readsPerSec: 300000,
       writesPerSec: 5000,
       storageGB: 2000000,
       latencyMs: 100,
-      users: "250M DAU",
+      users: "250M subscribers",
     },
     constraints: [
       "Adaptive bitrate streaming (ABR) using per-shot encoding — each scene encoded at optimal bitrate/resolution ladder",
@@ -1560,7 +1562,7 @@ export const PROBLEMS: Problem[] = [
       writesPerSec: 50000,
       storageGB: 100000,
       latencyMs: 200,
-      users: "75M DAU",
+      users: "75M MAU",
     },
     constraints: [
       "Geospatial proximity search using geohashing or R-tree index — find users within configurable radius (1-160 km)",
@@ -1770,13 +1772,13 @@ export const PROBLEMS: Problem[] = [
     title: "Doordash / Food Delivery",
     difficulty: "Hard",
     description:
-      "Design a food delivery platform like DoorDash or Uber Eats that connects customers, restaurants, and delivery drivers in real-time. DoorDash processes over 30 million orders per month across 80,000+ restaurants — the core challenges are building a real-time dispatch system that optimally matches orders to drivers (considering location, capacity, and estimated completion times), maintaining accurate ETAs that update as conditions change, and handling the three-sided marketplace where restaurant prep times, driver routes, and customer expectations must all be balanced simultaneously.",
+      "Design a food delivery platform like DoorDash or Uber Eats that connects customers, restaurants, and delivery drivers in real-time. DoorDash processes over 500 million orders per quarter across 500,000+ merchant partners — the core challenges are building a real-time dispatch system that optimally matches orders to drivers (considering location, capacity, and estimated completion times), maintaining accurate ETAs that update as conditions change, and handling the three-sided marketplace where restaurant prep times, driver routes, and customer expectations must all be balanced simultaneously.",
     requirements: {
       readsPerSec: 80000,
       writesPerSec: 40000,
       storageGB: 50000,
       latencyMs: 200,
-      users: "30M DAU",
+      users: "37M MAU",
     },
     constraints: [
       "Real-time order tracking with GPS updates every 5 seconds from active delivery drivers",
@@ -1843,13 +1845,13 @@ export const PROBLEMS: Problem[] = [
     title: "Reddit / Social News",
     difficulty: "Medium",
     description:
-      "Design a social news aggregation and discussion platform like Reddit. Users submit posts to topic-based communities (subreddits), vote content up or down, and engage in deeply nested comment threads. Reddit serves 50+ million daily active users across 100,000+ active communities — the key challenges are implementing a ranking algorithm (hot, top, controversial, best) that surfaces quality content across communities of vastly different sizes, efficiently storing and rendering deeply nested comment trees with thousands of replies, and building a moderation system that scales across volunteer moderators.",
+      "Design a social news aggregation and discussion platform like Reddit. Users submit posts to topic-based communities (subreddits), vote content up or down, and engage in deeply nested comment threads. Reddit serves 73+ million daily active users across 100,000+ active communities — the key challenges are implementing a ranking algorithm (hot, top, controversial, best) that surfaces quality content across communities of vastly different sizes, efficiently storing and rendering deeply nested comment trees with thousands of replies, and building a moderation system that scales across volunteer moderators.",
     requirements: {
       readsPerSec: 200000,
       writesPerSec: 20000,
       storageGB: 200000,
       latencyMs: 200,
-      users: "50M DAU",
+      users: "73M DAU",
     },
     constraints: [
       "Multiple ranking algorithms: hot (time-decayed score), top (by time window), controversial (balanced up/down), best (Wilson score)",
@@ -1916,7 +1918,7 @@ export const PROBLEMS: Problem[] = [
     title: "Airbnb / Booking Platform",
     difficulty: "Hard",
     description:
-      "Design a property rental and booking platform like Airbnb that connects hosts with guests for short-term stays. Airbnb has 7+ million active listings across 220 countries with 50 million monthly searches — the core challenges are building a search system that handles complex multi-dimensional queries (location, dates, price, amenities, guest count), implementing a booking and reservation system that prevents double-booking across overlapping date ranges, and building a dynamic pricing algorithm that helps hosts optimize revenue based on seasonality, local events, and comparable listings.",
+      "Design a property rental and booking platform like Airbnb that connects hosts with guests for short-term stays. Airbnb has 7+ million active listings across 220 countries with billions of monthly searches — the core challenges are building a search system that handles complex multi-dimensional queries (location, dates, price, amenities, guest count), implementing a booking and reservation system that prevents double-booking across overlapping date ranges, and building a dynamic pricing algorithm that helps hosts optimize revenue based on seasonality, local events, and comparable listings.",
     requirements: {
       readsPerSec: 100000,
       writesPerSec: 10000,
@@ -1994,7 +1996,7 @@ export const PROBLEMS: Problem[] = [
       "Design an end-to-end encrypted messaging platform like WhatsApp that handles 100+ billion messages per day across 2 billion monthly active users. The server never sees plaintext message content — the core challenges are implementing the Signal Protocol for end-to-end encryption with perfect forward secrecy, reliably delivering messages to offline users (store-and-forward), efficiently fanning out messages in group chats (up to 1024 members), and synchronizing message state across multiple linked devices while maintaining encryption guarantees.",
     requirements: {
       readsPerSec: 100000,
-      writesPerSec: 200000,
+      writesPerSec: 1000000,
       storageGB: 500000,
       latencyMs: 50,
       users: "2B MAU, 500M DAU",
@@ -2060,13 +2062,13 @@ export const PROBLEMS: Problem[] = [
     title: "Google Search / Search Engine",
     difficulty: "Hard",
     description:
-      "Design a web search engine like Google that crawls billions of web pages, builds an inverted index, ranks results by relevance, and returns the top results in under 200ms. Google processes over 8.5 billion searches per day across an index of hundreds of billions of pages (tens of petabytes) — the core challenges are building and maintaining a distributed inverted index that maps every word to the documents containing it, implementing a ranking algorithm (PageRank + hundreds of signals) that surfaces the most relevant results, and serving queries with sub-200ms latency by scattering the query across thousands of index shards in parallel.",
+      "Design a web search engine like Google that crawls billions of web pages, builds an inverted index, ranks results by relevance, and returns the top results in under 200ms. Google processes over 8.5 billion searches per day across an index of hundreds of billions of pages (hundreds of petabytes) — the core challenges are building and maintaining a distributed inverted index that maps every word to the documents containing it, implementing a ranking algorithm (PageRank + hundreds of signals) that surfaces the most relevant results, and serving queries with sub-200ms latency by scattering the query across thousands of index shards in parallel.",
     requirements: {
       readsPerSec: 500000,
       writesPerSec: 50000,
       storageGB: 10000000,
       latencyMs: 200,
-      users: "5B queries/day",
+      users: "8.5B queries/day",
     },
     constraints: [
       "Distributed inverted index sharded across thousands of machines — each shard holds a portion of the web",
@@ -2141,7 +2143,7 @@ export const PROBLEMS: Problem[] = [
       writesPerSec: 5000,
       storageGB: 50000,
       latencyMs: 200,
-      users: "30M DAU",
+      users: "33M MAU",
     },
     constraints: [
       "Geospatial search using QuadTree or Geohash index — find businesses within radius sorted by relevance and distance",
@@ -2205,13 +2207,13 @@ export const PROBLEMS: Problem[] = [
     title: "TikTok / Short Video",
     difficulty: "Hard",
     description:
-      "Design a short-form video platform like TikTok that serves personalized video feeds to over 1 billion daily active users. TikTok's recommendation engine is its core competitive advantage — it builds interest graphs from watch-time signals (not just social graphs) to surface relevant content even for new users within minutes. The platform processes over 1 billion video views per day with a multi-petabyte content library — the key challenges are building the For You Page (FYP) recommendation algorithm, a high-throughput video transcoding pipeline that processes millions of uploads daily, and a content moderation system that reviews content before publication.",
+      "Design a short-form video platform like TikTok that serves personalized video feeds to over 1.5 billion monthly active users. TikTok's recommendation engine is its core competitive advantage — it builds interest graphs from watch-time signals (not just social graphs) to surface relevant content even for new users within minutes. The platform processes billions of video views per day with a multi-petabyte content library — the key challenges are building the For You Page (FYP) recommendation algorithm, a high-throughput video transcoding pipeline that processes millions of uploads daily, and a content moderation system that reviews content before publication.",
     requirements: {
       readsPerSec: 500000,
       writesPerSec: 50000,
       storageGB: 5000000,
       latencyMs: 100,
-      users: "1B DAU",
+      users: "1.5B MAU",
     },
     constraints: [
       "For You Page recommendation combining collaborative filtering, content embeddings, and real-time engagement signals",

@@ -440,7 +440,7 @@ export const CONCEPT_LIBRARY: Record<string, ComponentConcept> = {
     ],
     keyTradeoffs: [
       "At-least-once delivery means consumers MUST be idempotent to handle duplicate messages",
-      "Ordering: Kafka guarantees per-partition ordering; SQS FIFO queues are limited to 300 msg/sec",
+      "Ordering: Kafka guarantees per-partition ordering; SQS FIFO queues support up to 70,000 msg/sec with high-throughput mode",
       "Message retention: Kafka retains messages for replay; SQS deletes after processing — different use cases",
       "Complexity: adding a queue means eventual consistency, dead-letter queues, and monitoring for lag",
     ],
