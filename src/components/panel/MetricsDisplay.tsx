@@ -43,7 +43,7 @@ export function MetricsDisplay() {
         <div className="rounded-md bg-zinc-800 px-2.5 py-2">
           <p className="text-[11px] text-zinc-500">Throughput</p>
           <p className="font-mono text-sm font-semibold text-zinc-100">
-            {result.throughput.toLocaleString()}
+            {new Intl.NumberFormat("en-US").format(result.throughput)}
           </p>
           <p className="text-[11px] text-zinc-500">req/s</p>
         </div>

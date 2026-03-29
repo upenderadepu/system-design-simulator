@@ -50,7 +50,7 @@ export function SimulationControls({ onSimulate }: SimulationControlsProps) {
           <div className="mb-1.5 flex items-center justify-between">
             <label className="text-xs text-zinc-400">Requests/sec</label>
             <span className="font-mono text-xs text-cyan-500">
-              {config.requestsPerSec.toLocaleString()}
+              {new Intl.NumberFormat("en-US").format(config.requestsPerSec)}
             </span>
           </div>
           <Slider

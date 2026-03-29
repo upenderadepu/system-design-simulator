@@ -151,9 +151,9 @@ function EstimationGuide({ problem }: GuideProps) {
           <div className="space-y-1">
             {[
               { label: "Users", value: problem.requirements.users },
-              { label: "Reads/sec", value: problem.requirements.readsPerSec.toLocaleString() },
-              { label: "Writes/sec", value: problem.requirements.writesPerSec.toLocaleString() },
-              { label: "Storage", value: `${problem.requirements.storageGB} GB` },
+              { label: "Reads/sec", value: new Intl.NumberFormat("en-US").format(problem.requirements.readsPerSec) },
+              { label: "Writes/sec", value: new Intl.NumberFormat("en-US").format(problem.requirements.writesPerSec) },
+              { label: "Storage", value: `${new Intl.NumberFormat("en-US").format(problem.requirements.storageGB)} GB` },
               { label: "Latency SLA", value: `< ${problem.requirements.latencyMs}ms` },
             ].map((item) => (
               <div key={item.label} className="flex items-center justify-between rounded-md bg-zinc-800 px-2.5 py-1.5">

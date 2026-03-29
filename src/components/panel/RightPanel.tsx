@@ -208,9 +208,9 @@ function PropertiesTab() {
           </p>
           <div className="space-y-1.5">
             {[
-              { label: "Reads/sec", value: problem.requirements.readsPerSec.toLocaleString() },
-              { label: "Writes/sec", value: problem.requirements.writesPerSec.toLocaleString() },
-              { label: "Storage", value: `${problem.requirements.storageGB} GB` },
+              { label: "Reads/sec", value: new Intl.NumberFormat("en-US").format(problem.requirements.readsPerSec) },
+              { label: "Writes/sec", value: new Intl.NumberFormat("en-US").format(problem.requirements.writesPerSec) },
+              { label: "Storage", value: `${new Intl.NumberFormat("en-US").format(problem.requirements.storageGB)} GB` },
               { label: "Latency SLA", value: `< ${problem.requirements.latencyMs}ms` },
               { label: "Users", value: problem.requirements.users },
             ].map((item) => (
@@ -285,7 +285,7 @@ function PropertiesTab() {
                 {data.label as string}
               </p>
               <p className="mt-0.5 text-xs text-zinc-500">
-                {data.category as string} · Max {(data.maxQPS as number) === Infinity ? "\u221e" : (data.maxQPS as number).toLocaleString()} QPS
+                {data.category as string} · Max {(data.maxQPS as number) === Infinity ? "\u221e" : new Intl.NumberFormat("en-US").format(data.maxQPS as number)} QPS
               </p>
             </div>
 
@@ -310,7 +310,7 @@ function PropertiesTab() {
                   className=""
                 />
                 <p className="mt-1 text-[11px] text-zinc-400">
-                  Effective capacity: {(((data.maxQPS as number) === Infinity ? Infinity : (data.maxQPS as number) * (data.replicas as number))).toLocaleString()} QPS
+                  Effective capacity: {(data.maxQPS as number) === Infinity ? "\u221e" : new Intl.NumberFormat("en-US").format((data.maxQPS as number) * (data.replicas as number))} QPS
                 </p>
               </div>
             )}
