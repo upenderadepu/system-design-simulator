@@ -9,6 +9,7 @@ import {
   BackgroundVariant,
   useReactFlow,
   type Node,
+  type Edge,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { nodeTypes } from "./nodes/nodeTypes";
@@ -29,6 +30,7 @@ export function DesignCanvas() {
   const addNode = useCanvasStore((s) => s.addNode);
   const updateNodeData = useCanvasStore((s) => s.updateNodeData);
   const setSelectedNode = useCanvasStore((s) => s.setSelectedNode);
+  const setSelectedEdge = useCanvasStore((s) => s.setSelectedEdge);
 
   // Listen for text node edits and persist them to the store
   useEffect(() => {
@@ -90,9 +92,17 @@ export function DesignCanvas() {
     [setSelectedNode]
   );
 
+  const onEdgeClick = useCallback(
+    (_: React.MouseEvent, edge: Edge) => {
+      setSelectedEdge(edge.id);
+    },
+    [setSelectedEdge]
+  );
+
   const onPaneClick = useCallback(() => {
     setSelectedNode(null);
-  }, [setSelectedNode]);
+    setSelectedEdge(null);
+  }, [setSelectedNode, setSelectedEdge]);
 
   const miniMapNodeColor = useMemo(
     () => (node: Node) => {
@@ -119,6 +129,7 @@ export function DesignCanvas() {
         onDrop={onDrop}
         onDragOver={onDragOver}
         onNodeClick={onNodeClick}
+        onEdgeClick={onEdgeClick}
         onPaneClick={onPaneClick}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}

@@ -14,12 +14,19 @@ import { scoreDesign } from "@/scoring/scorer";
 import { Toast } from "@/components/ui/Toast";
 import { SaveDialog } from "@/components/dialogs/SaveDialog";
 import { LoadDialog } from "@/components/dialogs/LoadDialog";
+import { InterviewBar } from "@/components/interview/InterviewBar";
+import { InterviewStartDialog } from "@/components/interview/InterviewStartDialog";
+import { useInterviewStore } from "@/store/interviewStore";
 
 export function AppShell() {
   const leftSidebarOpen = useAppStore((s) => s.leftSidebarOpen);
   const rightPanelOpen = useAppStore((s) => s.rightPanelOpen);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [loadDialogOpen, setLoadDialogOpen] = useState(false);
+  const [interviewDialogOpen, setInterviewDialogOpen] = useState(false);
+  const interviewMode = useInterviewStore((s) => s.mode);
+  const timerRunning = useInterviewStore((s) => s.timerRunning);
+  const tickTimer = useInterviewStore((s) => s.tickTimer);
 
   const handleSave = useCallback(() => setSaveDialogOpen(true), []);
   const handleLoad = useCallback(() => setLoadDialogOpen(true), []);
@@ -134,10 +141,20 @@ export function AppShell() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleSimulate, handleScore]);
 
+  // Interview timer tick
+  useEffect(() => {
+    if (!timerRunning) return;
+    const id = setInterval(() => {
+      tickTimer();
+    }, 1000);
+    return () => clearInterval(id);
+  }, [timerRunning, tickTimer]);
+
   return (
     <ReactFlowProvider>
       <div className="flex h-full flex-col">
-        <TopBar onSimulate={handleSimulate} onScore={handleScore} onClearCanvas={handleClearCanvas} onSave={handleSave} onLoad={handleLoad} />
+        {interviewMode === "interview" && <InterviewBar />}
+        <TopBar onSimulate={handleSimulate} onScore={handleScore} onClearCanvas={handleClearCanvas} onSave={handleSave} onLoad={handleLoad} onStartInterview={() => setInterviewDialogOpen(true)} />
 
         <div className="flex flex-1 overflow-hidden">
           <Sidebar open={leftSidebarOpen} />
@@ -149,6 +166,7 @@ export function AppShell() {
 
         <SaveDialog open={saveDialogOpen} onClose={() => setSaveDialogOpen(false)} />
         <LoadDialog open={loadDialogOpen} onClose={() => setLoadDialogOpen(false)} />
+        <InterviewStartDialog open={interviewDialogOpen} onClose={() => setInterviewDialogOpen(false)} />
       </div>
     </ReactFlowProvider>
   );

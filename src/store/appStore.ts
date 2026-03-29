@@ -11,7 +11,7 @@ interface AppState {
   selectedProblemId: string;
   leftSidebarOpen: boolean;
   rightPanelOpen: boolean;
-  activeRightTab: "properties" | "simulation" | "score" | "capacity";
+  activeRightTab: "properties" | "simulation" | "score" | "capacity" | "tradeoffs";
   theme: "dark" | "light";
   toast: ToastData | null;
 

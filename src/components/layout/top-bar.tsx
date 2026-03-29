@@ -17,6 +17,7 @@ import {
   Save,
   FolderOpen,
   StickyNote,
+  GraduationCap,
 } from "lucide-react";
 import { useAppStore } from "@/store/appStore";
 import { useCanvasStore } from "@/store/canvasStore";
@@ -32,9 +33,10 @@ interface TopBarProps {
   onClearCanvas: () => void;
   onSave: () => void;
   onLoad: () => void;
+  onStartInterview: () => void;
 }
 
-export function TopBar({ onSimulate, onScore, onClearCanvas, onSave, onLoad }: TopBarProps) {
+export function TopBar({ onSimulate, onScore, onClearCanvas, onSave, onLoad, onStartInterview }: TopBarProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const { getViewport } = useReactFlow();
@@ -247,6 +249,17 @@ export function TopBar({ onSimulate, onScore, onClearCanvas, onSave, onLoad }: T
         >
           <StickyNote className="h-3 w-3" />
           Add Note
+        </button>
+
+        <div className="mx-1 h-4 w-px bg-zinc-800" />
+
+        <button
+          onClick={onStartInterview}
+          className="flex items-center gap-1 rounded-md bg-zinc-800 px-2 py-1 text-[10px] font-medium text-zinc-300 transition-colors hover:bg-zinc-700 hover:text-zinc-100"
+          title="Start a guided interview practice"
+        >
+          <GraduationCap className="h-3.5 w-3.5" />
+          Practice Interview
         </button>
       </div>
 

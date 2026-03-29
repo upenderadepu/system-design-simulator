@@ -3,6 +3,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ComponentPalette } from "./ComponentPalette";
 import { ProblemSelector } from "./ProblemSelector";
+import { LearningPath } from "./LearningPath";
 
 interface SidebarProps {
   open: boolean;
@@ -32,6 +33,12 @@ export function Sidebar({ open }: SidebarProps) {
             >
               Problems
             </TabsTrigger>
+            <TabsTrigger
+              value="learn"
+              className="h-7 px-3 text-xs data-[state=active]:bg-zinc-700 data-[state=active]:text-zinc-100"
+            >
+              Learn
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="components" className="mt-0 flex-1 overflow-hidden">
@@ -40,6 +47,10 @@ export function Sidebar({ open }: SidebarProps) {
 
           <TabsContent value="problems" className="mt-0 flex-1 overflow-hidden">
             <ProblemSelector />
+          </TabsContent>
+
+          <TabsContent value="learn" className="mt-0 flex-1 overflow-hidden">
+            <LearningPath />
           </TabsContent>
         </Tabs>
       </div>
