@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import {
   type Node,
   type Edge,
@@ -60,71 +61,81 @@ interface CanvasState {
   deleteNode: (nodeId: string) => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const useCanvasStore = create<CanvasState>((set, _get) => ({
-  nodes: [],
-  edges: [],
-  selectedNodeId: null,
-  selectedEdgeId: null,
+export const useCanvasStore = create<CanvasState>()(
+  persist(
+    (set, _get) => ({
+      nodes: [],
+      edges: [],
+      selectedNodeId: null,
+      selectedEdgeId: null,
 
-  onNodesChange: (changes) => {
-    set((state) => ({
-      nodes: applyNodeChanges(changes, state.nodes) as Node[],
-    }));
-  },
-  onEdgesChange: (changes) => {
-    set((state) => ({ edges: applyEdgeChanges(changes, state.edges) }));
-  },
-  onConnect: (connection) => {
-    set((state) => ({
-      edges: addEdge(
-        { ...connection, type: "animated", data: { label: '', protocol: 'http', async: false } satisfies CustomEdgeData },
-        state.edges
-      ),
-    }));
-  },
-  addNode: (node) => {
-    set((state) => ({ nodes: [...state.nodes, node] }));
-  },
-  setSelectedNode: (id) => {
-    set({ selectedNodeId: id, selectedEdgeId: null });
-  },
-  setSelectedEdge: (id) => {
-    set({ selectedEdgeId: id, selectedNodeId: null });
-  },
-  updateNodeData: (nodeId, data) => {
-    set((state) => ({
-      nodes: state.nodes.map((n) =>
-        n.id === nodeId ? { ...n, data: { ...n.data, ...data } } : n
-      ),
-    }));
-  },
-  updateEdgeData: (edgeId, data) => {
-    set((state) => ({
-      edges: state.edges.map((e) =>
-        e.id === edgeId ? { ...e, data: { ...e.data, ...data } } : e
-      ),
-    }));
-  },
-  updateAllNodeData: (updates) => {
-    set((state) => ({
-      nodes: state.nodes.map((n) => {
-        const update = updates.get(n.id);
-        return update ? { ...n, data: { ...n.data, ...update } } : n;
+      onNodesChange: (changes) => {
+        set((state) => ({
+          nodes: applyNodeChanges(changes, state.nodes) as Node[],
+        }));
+      },
+      onEdgesChange: (changes) => {
+        set((state) => ({ edges: applyEdgeChanges(changes, state.edges) }));
+      },
+      onConnect: (connection) => {
+        set((state) => ({
+          edges: addEdge(
+            { ...connection, type: "animated", data: { label: '', protocol: 'http', async: false } satisfies CustomEdgeData },
+            state.edges
+          ),
+        }));
+      },
+      addNode: (node) => {
+        set((state) => ({ nodes: [...state.nodes, node] }));
+      },
+      setSelectedNode: (id) => {
+        set({ selectedNodeId: id, selectedEdgeId: null });
+      },
+      setSelectedEdge: (id) => {
+        set({ selectedEdgeId: id, selectedNodeId: null });
+      },
+      updateNodeData: (nodeId, data) => {
+        set((state) => ({
+          nodes: state.nodes.map((n) =>
+            n.id === nodeId ? { ...n, data: { ...n.data, ...data } } : n
+          ),
+        }));
+      },
+      updateEdgeData: (edgeId, data) => {
+        set((state) => ({
+          edges: state.edges.map((e) =>
+            e.id === edgeId ? { ...e, data: { ...e.data, ...data } } : e
+          ),
+        }));
+      },
+      updateAllNodeData: (updates) => {
+        set((state) => ({
+          nodes: state.nodes.map((n) => {
+            const update = updates.get(n.id);
+            return update ? { ...n, data: { ...n.data, ...update } } : n;
+          }),
+        }));
+      },
+      clearCanvas: () => {
+        set({ nodes: [], edges: [], selectedNodeId: null, selectedEdgeId: null });
+      },
+      deleteNode: (nodeId) => {
+        set((state) => ({
+          nodes: state.nodes.filter((n) => n.id !== nodeId),
+          edges: state.edges.filter(
+            (e) => e.source !== nodeId && e.target !== nodeId
+          ),
+          selectedNodeId:
+            state.selectedNodeId === nodeId ? null : state.selectedNodeId,
+        }));
+      },
+    }),
+    {
+      name: "systemsim-canvas",
+      partialize: (state) => ({
+        nodes: state.nodes,
+        edges: state.edges,
       }),
-    }));
-  },
-  clearCanvas: () => {
-    set({ nodes: [], edges: [], selectedNodeId: null, selectedEdgeId: null });
-  },
-  deleteNode: (nodeId) => {
-    set((state) => ({
-      nodes: state.nodes.filter((n) => n.id !== nodeId),
-      edges: state.edges.filter(
-        (e) => e.source !== nodeId && e.target !== nodeId
-      ),
-      selectedNodeId:
-        state.selectedNodeId === nodeId ? null : state.selectedNodeId,
-    }));
-  },
-}));
+    }
+  )
+);

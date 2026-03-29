@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export type ToastType = "success" | "error" | "info";
 
@@ -26,43 +27,54 @@ interface AppState {
 
 let toastTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
-export const useAppStore = create<AppState>((set) => ({
-  selectedProblemId: "url-shortener",
-  leftSidebarOpen: true,
-  rightPanelOpen: true,
-  activeRightTab: "properties",
-  theme: "dark",
-  toast: null,
+export const useAppStore = create<AppState>()(
+  persist(
+    (set) => ({
+      selectedProblemId: "url-shortener",
+      leftSidebarOpen: true,
+      rightPanelOpen: true,
+      activeRightTab: "properties",
+      theme: "dark",
+      toast: null,
 
-  setSelectedProblem: (id) => set({ selectedProblemId: id }),
-  toggleLeftSidebar: () =>
-    set((s) => ({ leftSidebarOpen: !s.leftSidebarOpen })),
-  toggleRightPanel: () =>
-    set((s) => ({ rightPanelOpen: !s.rightPanelOpen })),
-  setActiveRightTab: (tab) => set({ activeRightTab: tab }),
-  toggleTheme: () =>
-    set((s) => {
-      const newTheme = s.theme === "dark" ? "light" : "dark";
-      return { theme: newTheme };
+      setSelectedProblem: (id) => set({ selectedProblemId: id }),
+      toggleLeftSidebar: () =>
+        set((s) => ({ leftSidebarOpen: !s.leftSidebarOpen })),
+      toggleRightPanel: () =>
+        set((s) => ({ rightPanelOpen: !s.rightPanelOpen })),
+      setActiveRightTab: (tab) => set({ activeRightTab: tab }),
+      toggleTheme: () =>
+        set((s) => {
+          const newTheme = s.theme === "dark" ? "light" : "dark";
+          return { theme: newTheme };
+        }),
+      showToast: (message, type) => {
+        if (toastTimeoutId !== null) {
+          clearTimeout(toastTimeoutId);
+        }
+        set({ toast: { message, type } });
+        toastTimeoutId = setTimeout(() => {
+          set({ toast: null });
+          toastTimeoutId = null;
+        }, 4000);
+      },
+      clearToast: () => {
+        if (toastTimeoutId !== null) {
+          clearTimeout(toastTimeoutId);
+          toastTimeoutId = null;
+        }
+        set({ toast: null });
+      },
     }),
-  showToast: (message, type) => {
-    if (toastTimeoutId !== null) {
-      clearTimeout(toastTimeoutId);
+    {
+      name: "systemsim-app",
+      partialize: (state) => ({
+        selectedProblemId: state.selectedProblemId,
+        theme: state.theme,
+      }),
     }
-    set({ toast: { message, type } });
-    toastTimeoutId = setTimeout(() => {
-      set({ toast: null });
-      toastTimeoutId = null;
-    }, 4000);
-  },
-  clearToast: () => {
-    if (toastTimeoutId !== null) {
-      clearTimeout(toastTimeoutId);
-      toastTimeoutId = null;
-    }
-    set({ toast: null });
-  },
-}));
+  )
+);
 
 // Side effect: sync theme changes to document.documentElement
 useAppStore.subscribe((state, prevState) => {
