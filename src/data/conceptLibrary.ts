@@ -879,6 +879,211 @@ export const CONCEPT_LIBRARY: Record<string, ComponentConcept> = {
       "Stripe uses Redis-based locks to prevent double-charging during payment processing retries",
     ],
   },
+  "id-generator": {
+    componentId: "id-generator",
+    whenToUse: [
+      "Any distributed system needing globally unique identifiers without coordination",
+      "Database primary keys that must be sortable by creation time (Snowflake, ULID)",
+      "URL shorteners, tweet IDs, order IDs, trace IDs in distributed tracing",
+      "Sharding keys where sequential IDs cause hot partitions",
+    ],
+    whenNotToUse: [
+      "Single-database systems where auto-increment is sufficient",
+      "When IDs don't need to be globally unique (session-local counters)",
+    ],
+    keyTradeoffs: [
+      "Snowflake IDs are sortable but leak creation time; UUIDs are random but unsortable",
+      "Centralized ID services are simple but become SPOFs; embedded generators are resilient but need clock sync",
+      "64-bit Snowflake IDs are compact but overflow in ~69 years; 128-bit UUIDs never overflow but use more storage",
+      "Sequential IDs reveal volume/growth; random IDs prevent enumeration but fragment B-tree indexes",
+    ],
+    interviewTips: [
+      "Always mention Snowflake IDs by name — interviewers expect it for any ID generation discussion",
+      "Explain the bit layout: timestamp (41 bits) + machine ID (10 bits) + sequence (12 bits)",
+      "Discuss clock skew mitigation — NTP sync, logical clocks, or waiting for clock catch-up",
+    ],
+    commonPatterns: [
+      { name: "Twitter Snowflake", description: "64-bit IDs: 41-bit timestamp + 10-bit worker + 12-bit sequence; 4096 IDs/ms per worker" },
+      { name: "ULID", description: "128-bit: 48-bit timestamp + 80-bit random; lexicographically sortable, URL-safe" },
+      { name: "Database Ticket Server", description: "Central DB with auto-increment (Flickr pattern); simple but SPOF without replication" },
+    ],
+    realWorldExamples: [
+      "Twitter created Snowflake to generate ~10K unique IDs per second per process for tweet IDs",
+      "Instagram uses a PostgreSQL-based ID generator with epoch + shard ID + sequence",
+      "Discord uses Snowflake IDs for messages, enabling time-based sorting and sharding",
+    ],
+  },
+  "sharded-counter": {
+    componentId: "sharded-counter",
+    whenToUse: [
+      "High-write counters: like counts, view counts, follower counts at millions of writes/sec",
+      "Any counter where a single key would become a hot partition under concurrent writes",
+      "Real-time vote tallying, poll results, trending scores",
+      "Inventory count decrements during flash sales",
+    ],
+    whenNotToUse: [
+      "Low-volume counters where a single atomic increment is sufficient",
+      "When exact real-time accuracy is required (sharded reads are eventually consistent)",
+    ],
+    keyTradeoffs: [
+      "More shards = higher write throughput but slower reads (must aggregate across all shards)",
+      "Trade-off between read latency and write scalability — tune shard count per counter",
+      "Background reconciliation adds complexity but enables approximate real-time reads",
+      "Negative counts possible during race conditions — need floor checks or two-phase counting",
+    ],
+    interviewTips: [
+      "Mention this pattern whenever designing social media (likes, views, shares) at scale",
+      "Explain the read path: SUM across N shards, optionally cached for fast approximate reads",
+      "Discuss how YouTube counts views: sharded writes + periodic batch aggregation",
+    ],
+    commonPatterns: [
+      { name: "Redis Sharded Counter", description: "N Redis keys per logical counter; INCR random shard on write, MGET all shards on read" },
+      { name: "Database Counter Table", description: "N rows per counter; random row on write, SUM on read with caching" },
+      { name: "Approximate Counter", description: "Probabilistic counting (HyperLogLog) for unique counts; Count-Min Sketch for frequency" },
+    ],
+    realWorldExamples: [
+      "YouTube uses sharded counters for video view counts, aggregating periodically for display",
+      "Instagram shards like counts across multiple Redis keys to handle viral post spikes",
+      "Twitter uses distributed counters for tweet impression and engagement metrics",
+    ],
+  },
+  "pub-sub": {
+    componentId: "pub-sub",
+    whenToUse: [
+      "Event-driven fan-out: one event triggers multiple independent consumers (analytics, notifications, cache invalidation)",
+      "Decoupling services that don't need to know about each other",
+      "Change Data Capture (CDC) — broadcasting database changes to downstream systems",
+      "Real-time feed updates, live dashboards, IoT event distribution",
+    ],
+    whenNotToUse: [
+      "Point-to-point task distribution (use a message queue with competing consumers instead)",
+      "When message ordering across topics is critical (pub/sub topics are independently ordered)",
+    ],
+    keyTradeoffs: [
+      "Fan-out amplifies traffic: 1 publish to N subscribers = N message deliveries",
+      "At-least-once delivery is standard; exactly-once requires idempotent subscribers",
+      "Topic-based routing is simple but inflexible; content-based routing adds complexity",
+      "Push (server pushes to subscribers) vs pull (subscribers poll) affects latency and resource usage",
+    ],
+    interviewTips: [
+      "Clearly distinguish pub/sub (fan-out, all subscribers get every message) from queues (competing consumers, each message processed once)",
+      "Mention it whenever you have multiple downstream systems reacting to the same event",
+      "Discuss dead letter topics for failed message processing",
+    ],
+    commonPatterns: [
+      { name: "Topic Fan-out", description: "Publish to a topic; all subscriptions receive a copy. AWS SNS -> multiple SQS queues" },
+      { name: "Event Bus", description: "Central pub/sub for all domain events; subscribers filter by event type" },
+      { name: "CDC Stream", description: "Database changes published as events; consumers build materialized views" },
+    ],
+    realWorldExamples: [
+      "Google Cloud Pub/Sub handles trillions of messages per month across Google's infrastructure",
+      "Netflix uses Apache Kafka topics for real-time event streaming across 1000+ microservices",
+      "Slack uses a pub/sub system to fan out messages to all connected clients in a channel",
+    ],
+  },
+  "vector-db": {
+    componentId: "vector-db",
+    whenToUse: [
+      "Semantic/similarity search: find items similar to a query by meaning, not keywords",
+      "Recommendation engines: suggest content based on embedding similarity",
+      "RAG (Retrieval Augmented Generation) for LLM applications",
+      "Image search, audio fingerprinting, fraud detection via behavioral similarity",
+    ],
+    whenNotToUse: [
+      "Exact-match lookups (use a key-value store or traditional index instead)",
+      "Small datasets where brute-force search is fast enough",
+      "When you need ACID transactions or complex relational queries",
+    ],
+    keyTradeoffs: [
+      "ANN (approximate) search is fast but not exact — recall vs latency trade-off",
+      "HNSW indexing gives low latency but uses significant memory; IVF uses less memory but higher latency",
+      "Embedding dimension affects storage and query cost: 768-dim vs 1536-dim is 2x difference",
+      "Index build time can be hours for large datasets; incremental updates are challenging",
+    ],
+    interviewTips: [
+      "Mention vector databases when designing recommendation or search systems — it shows awareness of modern ML infrastructure",
+      "Explain the pipeline: raw data -> embedding model -> vector DB -> ANN query -> ranked results",
+      "Discuss hybrid search: combine vector similarity with keyword filters for better relevance",
+    ],
+    commonPatterns: [
+      { name: "Embedding + ANN", description: "Convert items to vectors via ML model; index in vector DB; query with cosine/dot-product similarity" },
+      { name: "Hybrid Search", description: "Combine dense vector similarity with sparse keyword matching (BM25) for best relevance" },
+      { name: "RAG Pipeline", description: "Chunk documents -> embed -> store in vector DB -> retrieve context for LLM prompt" },
+    ],
+    realWorldExamples: [
+      "Spotify uses embeddings for podcast and music recommendations via approximate nearest-neighbor search",
+      "Pinterest uses vector search for visual similarity in their 'More like this' feature",
+      "OpenAI's ChatGPT uses vector databases for retrieval-augmented generation in enterprise deployments",
+    ],
+  },
+  "geospatial-index": {
+    componentId: "geospatial-index",
+    whenToUse: [
+      "Proximity search: find nearby drivers, restaurants, businesses within a radius",
+      "Geo-fenced operations: determine which zone/region a point belongs to",
+      "Route optimization and ETA estimation with location data",
+      "Real-time location tracking with spatial queries",
+    ],
+    whenNotToUse: [
+      "Non-geographic data that happens to have coordinates (use a regular index)",
+      "When exact geometric calculations aren't needed (approximate distance formulas suffice)",
+    ],
+    keyTradeoffs: [
+      "Geohash is simple and works with any sorted index but has edge-case issues at cell boundaries",
+      "Quadtree adapts to data density but requires custom implementation",
+      "H3 (Uber's hex grid) provides uniform area cells but adds a library dependency",
+      "PostGIS is powerful but ties you to PostgreSQL; Redis GEO is simpler but less feature-rich",
+    ],
+    interviewTips: [
+      "Always mention geohash or quadtree when designing Uber, Yelp, or any location-based system",
+      "Explain the precision trade-off: shorter geohash = larger cell = faster but less precise",
+      "Discuss how to handle boundary issues: query neighboring cells to avoid missing nearby results",
+    ],
+    commonPatterns: [
+      { name: "Geohash Grid", description: "Encode lat/lng into a string prefix; nearby points share prefixes; query by prefix range" },
+      { name: "Quadtree", description: "Recursively subdivide space into 4 quadrants; leaf nodes contain points; adapts to data density" },
+      { name: "H3 Hexagonal Grid", description: "Uber's hierarchical hex grid; uniform-area cells; 16 resolution levels from continent to sub-meter" },
+    ],
+    realWorldExamples: [
+      "Uber uses H3 hexagonal indexing for surge pricing zones and driver-rider matching",
+      "Yelp uses Elasticsearch geo_point queries for 'restaurants near me' with distance sorting",
+      "DoorDash uses geospatial indexing to match orders with nearby delivery drivers in real time",
+    ],
+  },
+  "config-service": {
+    componentId: "config-service",
+    whenToUse: [
+      "Feature flags: toggle features on/off without redeployment",
+      "A/B testing: route percentages of traffic to different code paths",
+      "Gradual rollouts: canary new features to 1% -> 10% -> 50% -> 100% of users",
+      "Runtime tuning: adjust rate limits, cache TTLs, algorithm parameters without restarts",
+    ],
+    whenNotToUse: [
+      "Static configuration that changes only at deploy time (use environment variables)",
+      "Secrets management (use a dedicated vault like HashiCorp Vault or AWS Secrets Manager)",
+    ],
+    keyTradeoffs: [
+      "Push (server pushes config changes) vs pull (clients poll periodically) — push is faster but needs persistent connections",
+      "Strong consistency (all nodes see same config) vs eventual consistency (faster propagation)",
+      "Centralized config service is a potential SPOF — need local caching with fallback",
+      "Feature flag complexity grows quickly — need cleanup processes for stale flags",
+    ],
+    interviewTips: [
+      "Mention feature flags when discussing deployment strategies — shows operational maturity",
+      "Explain how gradual rollouts reduce blast radius of bugs",
+      "Discuss config propagation latency — stale config can cause inconsistent behavior across nodes",
+    ],
+    commonPatterns: [
+      { name: "Feature Flag", description: "Boolean or multivariate flag checked at runtime; enables trunk-based development and dark launches" },
+      { name: "Percentage Rollout", description: "Hash user ID to determine if they're in the rollout percentage; deterministic per user" },
+      { name: "Config Hierarchy", description: "Default -> environment -> service -> instance overrides; most specific wins" },
+    ],
+    realWorldExamples: [
+      "Netflix uses their internal config service to manage thousands of feature flags across 1000+ microservices",
+      "Facebook evaluates millions of feature flag checks per second using their Gatekeeper system",
+      "LaunchDarkly processes 30+ trillion feature flag evaluations per month for enterprise customers",
+    ],
+  },
 };
 
 export function getConceptByComponentId(componentId: string): ComponentConcept | undefined {

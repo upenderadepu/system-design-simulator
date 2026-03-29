@@ -369,6 +369,82 @@ export const SYSTEM_COMPONENTS: SystemComponent[] = [
     description:
       "A generic component that can be renamed to represent any service, system, or infrastructure not available in the predefined component library. Double-click the node label on the canvas to rename it. Use this for specialized services like ML inference engines, recommendation services, fraud detection, content moderation, or any domain-specific component.",
   },
+  // ID & Counting
+  {
+    id: "id-generator",
+    label: "ID Generator",
+    category: "infrastructure",
+    icon: "Fingerprint",
+    maxQPS: 500000,
+    latencyMs: 1,
+    scalable: true,
+    stateful: true,
+    description:
+      "Generates globally unique, sortable IDs across distributed nodes using algorithms like Twitter Snowflake, ULID, or UUID. Each node embeds a timestamp, machine ID, and sequence number to guarantee uniqueness without centralized coordination. Essential for database primary keys, URL shortening, event ordering, and sharding keys.",
+  },
+  {
+    id: "sharded-counter",
+    label: "Sharded Counter",
+    category: "infrastructure",
+    icon: "Hash",
+    maxQPS: 500000,
+    latencyMs: 2,
+    scalable: true,
+    stateful: true,
+    description:
+      "Distributes a single logical counter across multiple shards to avoid hot-key bottlenecks under massive concurrent writes. Reads aggregate across shards with eventual consistency. Critical for like counts, view counters, follower counts, and real-time voting at scale. Typically backed by Redis or purpose-built counter tables with periodic reconciliation.",
+  },
+  // Messaging
+  {
+    id: "pub-sub",
+    label: "Pub/Sub",
+    category: "messaging",
+    icon: "Megaphone",
+    maxQPS: 200000,
+    latencyMs: 5,
+    scalable: true,
+    stateful: true,
+    description:
+      "Topic-based publish/subscribe messaging where each message is broadcast to all subscribers, unlike point-to-point queues where each message is consumed by one consumer. Enables event-driven fan-out for feeds, analytics pipelines, CDC, and cross-service event propagation. Google Cloud Pub/Sub, AWS SNS, and Apache Kafka topics are canonical implementations.",
+  },
+  // Storage
+  {
+    id: "vector-db",
+    label: "Vector Database",
+    category: "storage",
+    icon: "Brain",
+    maxQPS: 10000,
+    latencyMs: 10,
+    scalable: true,
+    stateful: true,
+    description:
+      "Stores high-dimensional vector embeddings and performs approximate nearest-neighbor (ANN) search for similarity matching. Powers recommendation engines, semantic search, image search, and RAG-based AI systems. Pinecone, Weaviate, Milvus, Qdrant, and pgvector are leading implementations using HNSW or IVF indexing algorithms.",
+  },
+  {
+    id: "geospatial-index",
+    label: "Geospatial Index",
+    category: "storage",
+    icon: "MapPin",
+    maxQPS: 50000,
+    latencyMs: 5,
+    scalable: true,
+    stateful: true,
+    description:
+      "Indexes and queries location data using geohash, quadtree, R-tree, or H3 hexagonal grids for efficient nearest-neighbor and radius searches. Essential for ride-sharing, food delivery, local search, and any proximity-based system. PostGIS, Redis GEO (GEOADD/GEOSEARCH), Elasticsearch geo_point, and Google S2 library are common implementations.",
+  },
+  // Infrastructure
+  {
+    id: "config-service",
+    label: "Config Service",
+    category: "infrastructure",
+    icon: "Settings",
+    maxQPS: 50000,
+    latencyMs: 2,
+    scalable: true,
+    stateful: true,
+    description:
+      "Centralized dynamic configuration management for feature flags, A/B test parameters, and runtime settings without redeployment. Supports versioning, rollback, targeted rollouts by user segment, and real-time propagation to all service instances. AWS AppConfig, LaunchDarkly, Unleash, and etcd-backed config stores are common implementations.",
+  },
 ];
 
 export const COMPONENT_CATEGORIES = [
