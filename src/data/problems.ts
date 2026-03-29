@@ -1472,6 +1472,1086 @@ export const PROBLEMS: Problem[] = [
     },
     tags: ["TimeSeries", "Alerting", "Aggregation"],
   },
+  {
+    id: "netflix",
+    title: "Netflix / Video Streaming Platform",
+    difficulty: "Hard",
+    description:
+      "Design a video streaming platform like Netflix that serves personalized content to 250 million daily active users across 190+ countries. Netflix accounts for over 15% of global internet bandwidth during peak hours — the key challenges are building a content recommendation engine that drives 80% of watch time, implementing adaptive bitrate streaming (ABR) that adjusts quality frame-by-frame based on network conditions, and leveraging a global CDN (Open Connect) with ISP-embedded appliances to serve 17,000+ titles with sub-second start times.",
+    requirements: {
+      readsPerSec: 300000,
+      writesPerSec: 5000,
+      storageGB: 2000000,
+      latencyMs: 100,
+      users: "250M DAU",
+    },
+    constraints: [
+      "Adaptive bitrate streaming (ABR) using per-shot encoding — each scene encoded at optimal bitrate/resolution ladder",
+      "Content recommendation engine processing billions of implicit signals (watch time, pauses, rewatches, abandons)",
+      "Global CDN with ISP-embedded Open Connect Appliances (OCAs) caching popular content at the network edge",
+      "DRM enforcement (Widevine, FairPlay, PlayReady) with license server handling 100K+ license requests/sec",
+      "Multi-profile support per account with isolated recommendation models and viewing history",
+      "Content ingestion pipeline: ingest mezzanine file → encode 1200+ variants (resolution × bitrate × codec) per title",
+    ],
+    hints: [
+      {
+        title: "Content delivery",
+        content:
+          "Use a CDN with ISP-embedded edge appliances for popular titles. Pre-position content during off-peak hours based on predicted regional demand.",
+      },
+      {
+        title: "Recommendation engine",
+        content:
+          "Combine collaborative filtering with deep learning models trained on viewing patterns. Stream user events through a message queue for real-time signal processing.",
+      },
+      {
+        title: "Encoding pipeline",
+        content:
+          "Use per-title and per-shot encoding optimization. Process through a message queue that triggers parallel transcoding workers to generate the full resolution/bitrate ladder.",
+      },
+      {
+        title: "Advanced: Microservice architecture",
+        content:
+          "Netflix uses 1000+ microservices. Separate the control plane (API, auth, recommendations, search) from the data plane (video streaming via CDN). The API gateway (Zuul) handles routing, auth, and rate limiting. Use a cache (EVCache/Memcached) aggressively — Netflix caches billions of data points to achieve sub-100ms API responses.",
+      },
+    ],
+    referenceSolution: {
+      nodes: [
+        { componentId: "dns", x: 50, y: 250 },
+        { componentId: "cdn", x: 200, y: 80 },
+        { componentId: "load-balancer", x: 200, y: 250 },
+        { componentId: "api-gateway", x: 350, y: 250 },
+        { componentId: "auth-service", x: 350, y: 420 },
+        { componentId: "app-server", x: 530, y: 250 },
+        { componentId: "cache", x: 530, y: 80 },
+        { componentId: "message-queue", x: 530, y: 420 },
+        { componentId: "nosql-db", x: 720, y: 250 },
+        { componentId: "object-storage", x: 720, y: 80 },
+        { componentId: "search", x: 720, y: 420 },
+        { componentId: "stream-processor", x: 880, y: 420 },
+        { componentId: "monitoring", x: 880, y: 250 },
+      ],
+      edges: [
+        { source: "dns", target: "cdn" },
+        { source: "dns", target: "load-balancer" },
+        { source: "cdn", target: "object-storage" },
+        { source: "load-balancer", target: "api-gateway" },
+        { source: "api-gateway", target: "auth-service" },
+        { source: "api-gateway", target: "app-server" },
+        { source: "app-server", target: "cache" },
+        { source: "app-server", target: "message-queue" },
+        { source: "app-server", target: "nosql-db" },
+        { source: "app-server", target: "search" },
+        { source: "message-queue", target: "stream-processor" },
+        { source: "message-queue", target: "object-storage" },
+        { source: "app-server", target: "monitoring" },
+      ],
+    },
+    tags: ["Streaming", "CDN", "Recommendations", "DRM"],
+  },
+  {
+    id: "tinder",
+    title: "Tinder / Dating App",
+    difficulty: "Medium",
+    description:
+      "Design a location-based dating application like Tinder that matches users based on geographic proximity, preferences, and compatibility signals. Tinder processes over 2 billion swipes per day with 75 million monthly active users — the key challenges are building an efficient geospatial index for proximity matching, a recommendation engine that surfaces relevant profiles while avoiding already-seen users, and handling the high write throughput of swipe events with real-time match notifications when two users swipe right on each other.",
+    requirements: {
+      readsPerSec: 100000,
+      writesPerSec: 50000,
+      storageGB: 100000,
+      latencyMs: 200,
+      users: "75M DAU",
+    },
+    constraints: [
+      "Geospatial proximity search using geohashing or R-tree index — find users within configurable radius (1-160 km)",
+      "Recommendation engine that filters by preferences (age, gender, distance) and ranks by compatibility score",
+      "Swipe deduplication — never show a user the same profile twice, even across sessions",
+      "Real-time match detection — when both users swipe right, notify both instantly via push notification",
+      "Photo storage and serving with face detection validation and content moderation pipeline",
+      "ELO-like scoring system that adapts profile visibility based on desirability signals",
+    ],
+    hints: [
+      {
+        title: "Geospatial indexing",
+        content:
+          "Use geohashing to partition users by location. Store active user locations in Redis with GEOADD for O(log N) proximity queries within a radius.",
+      },
+      {
+        title: "Recommendation pipeline",
+        content:
+          "Pre-compute a recommendation deck for each active user: filter by preferences, exclude already-swiped profiles, rank by compatibility score, and cache the top 100 candidates.",
+      },
+      {
+        title: "Match detection",
+        content:
+          "On each right-swipe, check if the target user has already right-swiped the current user. Store swipes in a NoSQL database keyed by (swiper, swipee) for O(1) lookup.",
+      },
+      {
+        title: "Advanced: Sharded recommendation",
+        content:
+          "Partition the user base by geohash prefix so each recommendation shard handles a geographic region. Within each shard, maintain a bloom filter of seen profiles per user to avoid re-showing. Pre-compute recommendation decks during off-peak hours using a stream processor that scores all eligible matches.",
+      },
+    ],
+    referenceSolution: {
+      nodes: [
+        { componentId: "dns", x: 50, y: 250 },
+        { componentId: "cdn", x: 200, y: 80 },
+        { componentId: "load-balancer", x: 200, y: 250 },
+        { componentId: "api-gateway", x: 350, y: 250 },
+        { componentId: "app-server", x: 530, y: 250 },
+        { componentId: "cache", x: 530, y: 80 },
+        { componentId: "nosql-db", x: 720, y: 200 },
+        { componentId: "object-storage", x: 720, y: 80 },
+        { componentId: "message-queue", x: 530, y: 420 },
+        { componentId: "stream-processor", x: 720, y: 420 },
+        { componentId: "monitoring", x: 880, y: 250 },
+      ],
+      edges: [
+        { source: "dns", target: "cdn" },
+        { source: "dns", target: "load-balancer" },
+        { source: "cdn", target: "object-storage" },
+        { source: "load-balancer", target: "api-gateway" },
+        { source: "api-gateway", target: "app-server" },
+        { source: "app-server", target: "cache" },
+        { source: "app-server", target: "nosql-db" },
+        { source: "app-server", target: "message-queue" },
+        { source: "message-queue", target: "stream-processor" },
+        { source: "stream-processor", target: "nosql-db" },
+        { source: "app-server", target: "monitoring" },
+      ],
+    },
+    tags: ["Geo-spatial", "Matching", "Recommendations", "Real-time"],
+  },
+  {
+    id: "google-maps",
+    title: "Google Maps / Navigation",
+    difficulty: "Hard",
+    description:
+      "Design a mapping and navigation platform like Google Maps that serves map tiles, computes optimal routes, provides real-time traffic updates, and estimates accurate ETAs. Google Maps serves over 1 billion daily active users and processes 1 billion kilometers of driving directions daily — the core challenges are serving pre-rendered map tiles at multiple zoom levels from a multi-petabyte tile corpus, computing shortest paths on a road graph with hundreds of millions of edges using hierarchical algorithms (Contraction Hierarchies / A*), and ingesting real-time GPS probe data from millions of devices to update traffic conditions every 30 seconds.",
+    requirements: {
+      readsPerSec: 500000,
+      writesPerSec: 100000,
+      storageGB: 5000000,
+      latencyMs: 200,
+      users: "1B DAU",
+    },
+    constraints: [
+      "Map tile serving at 20+ zoom levels — vector tiles for mobile, raster tiles for web, pre-rendered and cached at CDN edge",
+      "Route computation using Contraction Hierarchies or A* on a graph with 500M+ road segments in under 200ms",
+      "Real-time traffic layer updated every 30 seconds from GPS probe data aggregated across millions of active drivers",
+      "ETA prediction combining historical patterns, live traffic, road type, and time-of-day with < 20% error",
+      "Multi-modal routing: driving, walking, cycling, public transit with real-time schedule integration",
+      "Geocoding and reverse geocoding with fuzzy address matching across 200+ countries and scripts",
+    ],
+    hints: [
+      {
+        title: "Map tile serving",
+        content:
+          "Pre-render tiles at each zoom level and store in object storage. Serve via CDN for instant loading. Use vector tiles on mobile to reduce bandwidth — the client renders them locally.",
+      },
+      {
+        title: "Route computation",
+        content:
+          "Use Contraction Hierarchies (CH) to preprocess the road graph. CH reduces a cross-country route query from millions of edge relaxations to a few thousand, enabling sub-200ms responses.",
+      },
+      {
+        title: "Real-time traffic",
+        content:
+          "Ingest GPS probes from active users into a stream processor. Aggregate speed per road segment over 30-second windows. Store in a time-series database and overlay on the pre-computed road graph.",
+      },
+      {
+        title: "Advanced: Partitioned graph serving",
+        content:
+          "Partition the road graph geographically. Each partition server handles local routing. For cross-partition routes, use a two-level approach: a global overlay graph of inter-partition highways handles the macro route, then local servers compute the first-mile and last-mile segments. Cache popular origin-destination pairs for instant responses.",
+      },
+    ],
+    referenceSolution: {
+      nodes: [
+        { componentId: "dns", x: 50, y: 250 },
+        { componentId: "cdn", x: 200, y: 80 },
+        { componentId: "load-balancer", x: 200, y: 250 },
+        { componentId: "api-gateway", x: 350, y: 250 },
+        { componentId: "app-server", x: 530, y: 250 },
+        { componentId: "cache", x: 530, y: 80 },
+        { componentId: "nosql-db", x: 720, y: 200 },
+        { componentId: "object-storage", x: 720, y: 80 },
+        { componentId: "stream-processor", x: 530, y: 420 },
+        { componentId: "timeseries-db", x: 720, y: 420 },
+        { componentId: "monitoring", x: 880, y: 250 },
+      ],
+      edges: [
+        { source: "dns", target: "cdn" },
+        { source: "dns", target: "load-balancer" },
+        { source: "cdn", target: "object-storage" },
+        { source: "load-balancer", target: "api-gateway" },
+        { source: "api-gateway", target: "app-server" },
+        { source: "app-server", target: "cache" },
+        { source: "app-server", target: "nosql-db" },
+        { source: "app-server", target: "stream-processor" },
+        { source: "stream-processor", target: "timeseries-db" },
+        { source: "app-server", target: "monitoring" },
+      ],
+    },
+    tags: ["Geo-spatial", "Graph", "Real-time", "CDN"],
+  },
+  {
+    id: "zoom",
+    title: "Zoom / Video Conferencing",
+    difficulty: "Hard",
+    description:
+      "Design a real-time video conferencing platform like Zoom that supports meetings with up to 1000 participants, screen sharing, recording, and breakout rooms. Zoom handles over 300 million daily meeting participants with end-to-end latency under 150ms — the core challenges are building a Selective Forwarding Unit (SFU) architecture that routes video streams without transcoding to minimize latency, managing bandwidth allocation when dozens of participants have cameras enabled simultaneously, and providing reliable recording with server-side mixing for cloud playback.",
+    requirements: {
+      readsPerSec: 50000,
+      writesPerSec: 50000,
+      storageGB: 500000,
+      latencyMs: 50,
+      users: "300M daily meeting participants",
+    },
+    constraints: [
+      "End-to-end glass-to-glass latency under 150ms for real-time audio/video using WebRTC or custom UDP protocol",
+      "SFU (Selective Forwarding Unit) architecture — server forwards streams without transcoding to minimize latency",
+      "Simulcast: each sender encodes 3 quality layers (low/medium/high), SFU selects per-receiver based on bandwidth and layout",
+      "Screen sharing at 1080p/30fps alongside camera feeds with independent bandwidth allocation",
+      "Cloud recording with server-side mixing — composite multiple video streams into a single recording file",
+      "Breakout rooms, waiting rooms, and host controls with real-time state synchronization across all participants",
+    ],
+    hints: [
+      {
+        title: "SFU over MCU",
+        content:
+          "Use a Selective Forwarding Unit (SFU) instead of a Multipoint Control Unit (MCU). SFU forwards packets without decoding/re-encoding, reducing latency and server CPU cost by 10x compared to MCU.",
+      },
+      {
+        title: "Simulcast for bandwidth",
+        content:
+          "Each sender publishes 3 quality layers (e.g., 180p, 360p, 720p). The SFU dynamically selects the appropriate layer for each receiver based on their available bandwidth and visible tile size.",
+      },
+      {
+        title: "Distributed media routing",
+        content:
+          "Deploy SFU servers in multiple regions. For cross-region meetings, cascade SFU servers over dedicated backbone links rather than sending each participant's stream across regions independently.",
+      },
+      {
+        title: "Advanced: Geo-distributed SFU mesh",
+        content:
+          "For global meetings, deploy SFU nodes in each participant's nearest region. Connect SFU nodes via a server-to-server mesh over the provider's backbone network. Each SFU forwards only the active speaker and pinned streams across regions (not all participants), reducing cross-region bandwidth by 80%. Use SRTP for encryption and RTCP feedback for congestion control.",
+      },
+    ],
+    referenceSolution: {
+      nodes: [
+        { componentId: "dns", x: 50, y: 250 },
+        { componentId: "load-balancer", x: 200, y: 250 },
+        { componentId: "api-gateway", x: 350, y: 250 },
+        { componentId: "websocket-server", x: 350, y: 420 },
+        { componentId: "app-server", x: 530, y: 250 },
+        { componentId: "cache", x: 530, y: 80 },
+        { componentId: "nosql-db", x: 720, y: 200 },
+        { componentId: "object-storage", x: 720, y: 80 },
+        { componentId: "message-queue", x: 530, y: 420 },
+        { componentId: "monitoring", x: 880, y: 250 },
+      ],
+      edges: [
+        { source: "dns", target: "load-balancer" },
+        { source: "load-balancer", target: "api-gateway" },
+        { source: "load-balancer", target: "websocket-server" },
+        { source: "api-gateway", target: "app-server" },
+        { source: "websocket-server", target: "app-server" },
+        { source: "app-server", target: "cache" },
+        { source: "app-server", target: "nosql-db" },
+        { source: "app-server", target: "message-queue" },
+        { source: "message-queue", target: "object-storage" },
+        { source: "app-server", target: "monitoring" },
+      ],
+    },
+    tags: ["WebRTC", "Real-time", "Media", "SFU"],
+  },
+  {
+    id: "food-delivery",
+    title: "Doordash / Food Delivery",
+    difficulty: "Hard",
+    description:
+      "Design a food delivery platform like DoorDash or Uber Eats that connects customers, restaurants, and delivery drivers in real-time. DoorDash processes over 30 million orders per month across 80,000+ restaurants — the core challenges are building a real-time dispatch system that optimally matches orders to drivers (considering location, capacity, and estimated completion times), maintaining accurate ETAs that update as conditions change, and handling the three-sided marketplace where restaurant prep times, driver routes, and customer expectations must all be balanced simultaneously.",
+    requirements: {
+      readsPerSec: 80000,
+      writesPerSec: 40000,
+      storageGB: 50000,
+      latencyMs: 200,
+      users: "30M DAU",
+    },
+    constraints: [
+      "Real-time order tracking with GPS updates every 5 seconds from active delivery drivers",
+      "Driver dispatch algorithm optimizing for delivery time, driver earnings, and order batching (multi-pickup routes)",
+      "Restaurant inventory and prep-time estimation — dynamically adjust menu availability based on kitchen capacity",
+      "ETA prediction combining restaurant prep time, driver travel time, and real-time traffic conditions",
+      "Payment splitting: customer charge, restaurant payout (minus commission), driver payout (base + tips + peak pay)",
+      "Surge pricing and delivery fee calculation based on real-time demand/supply ratio per zone",
+    ],
+    hints: [
+      {
+        title: "Three-sided marketplace",
+        content:
+          "Model the system as three user types: customers (ordering), restaurants (preparing), and drivers (delivering). Each has separate real-time state that must be coordinated.",
+      },
+      {
+        title: "Dispatch optimization",
+        content:
+          "Use a centralized dispatch service that runs a matching algorithm every few seconds, considering driver proximity to restaurant, current orders in progress, and restaurant prep time estimates.",
+      },
+      {
+        title: "Real-time tracking",
+        content:
+          "Ingest driver GPS updates into a stream processor. Update ETAs in real-time and push to customers via WebSocket or server-sent events.",
+      },
+      {
+        title: "Advanced: Order batching",
+        content:
+          "DoorDash groups multiple orders from nearby restaurants heading to nearby destinations into a single driver route. The dispatch algorithm runs a traveling-salesman heuristic (nearest-neighbor with 2-opt improvement) to minimize total delivery time while keeping each individual order within its promised ETA window.",
+      },
+    ],
+    referenceSolution: {
+      nodes: [
+        { componentId: "dns", x: 50, y: 250 },
+        { componentId: "cdn", x: 200, y: 80 },
+        { componentId: "load-balancer", x: 200, y: 250 },
+        { componentId: "api-gateway", x: 350, y: 250 },
+        { componentId: "app-server", x: 530, y: 250 },
+        { componentId: "cache", x: 530, y: 80 },
+        { componentId: "message-queue", x: 530, y: 420 },
+        { componentId: "nosql-db", x: 720, y: 300 },
+        { componentId: "sql-db", x: 720, y: 150 },
+        { componentId: "stream-processor", x: 720, y: 420 },
+        { componentId: "monitoring", x: 880, y: 250 },
+      ],
+      edges: [
+        { source: "dns", target: "cdn" },
+        { source: "dns", target: "load-balancer" },
+        { source: "load-balancer", target: "api-gateway" },
+        { source: "api-gateway", target: "app-server" },
+        { source: "app-server", target: "cache" },
+        { source: "app-server", target: "message-queue" },
+        { source: "app-server", target: "sql-db" },
+        { source: "app-server", target: "nosql-db" },
+        { source: "message-queue", target: "stream-processor" },
+        { source: "stream-processor", target: "nosql-db" },
+        { source: "app-server", target: "monitoring" },
+      ],
+    },
+    tags: ["Geo-spatial", "Real-time", "Dispatch", "Marketplace"],
+  },
+  {
+    id: "reddit",
+    title: "Reddit / Social News",
+    difficulty: "Medium",
+    description:
+      "Design a social news aggregation and discussion platform like Reddit. Users submit posts to topic-based communities (subreddits), vote content up or down, and engage in deeply nested comment threads. Reddit serves 50+ million daily active users across 100,000+ active communities — the key challenges are implementing a ranking algorithm (hot, top, controversial, best) that surfaces quality content across communities of vastly different sizes, efficiently storing and rendering deeply nested comment trees with thousands of replies, and building a moderation system that scales across volunteer moderators.",
+    requirements: {
+      readsPerSec: 200000,
+      writesPerSec: 20000,
+      storageGB: 200000,
+      latencyMs: 200,
+      users: "50M DAU",
+    },
+    constraints: [
+      "Multiple ranking algorithms: hot (time-decayed score), top (by time window), controversial (balanced up/down), best (Wilson score)",
+      "Nested comment trees with efficient rendering — load top-level comments first, lazy-load deep threads",
+      "Subreddit isolation — each community has its own rules, moderators, CSS themes, and content policies",
+      "Vote counting with anti-manipulation: rate limiting, vote fuzzing, and bot detection",
+      "Cross-posting and content aggregation across subreddits with deduplication on /r/all",
+      "Full-text search across posts and comments with subreddit and time-range filters",
+    ],
+    hints: [
+      {
+        title: "Ranking algorithm",
+        content:
+          "Reddit's hot ranking uses: score = log10(max(|ups - downs|, 1)) + sign(ups - downs) * (post_time - epoch) / 45000. Pre-compute rankings and cache the sorted feeds for each subreddit.",
+      },
+      {
+        title: "Comment tree storage",
+        content:
+          "Store comments in a NoSQL database with parent_id for tree structure. Use materialized path (e.g., 'root/parent/child') for efficient subtree queries. Cache top-level comments aggressively.",
+      },
+      {
+        title: "Vote processing",
+        content:
+          "Process votes through a message queue to decouple the fast vote acknowledgment from the slower ranking recalculation. Use Redis to cache current vote counts per post.",
+      },
+      {
+        title: "Advanced: Hybrid feed computation",
+        content:
+          "For small subreddits (< 10K subscribers), compute rankings on the fly from cached vote counts. For large subreddits (> 100K), pre-compute ranked feeds every 30 seconds using a background job. For /r/all, use a stream processor that merges top posts from all subreddits with normalized scoring to prevent large communities from dominating.",
+      },
+    ],
+    referenceSolution: {
+      nodes: [
+        { componentId: "dns", x: 50, y: 250 },
+        { componentId: "cdn", x: 200, y: 80 },
+        { componentId: "load-balancer", x: 200, y: 250 },
+        { componentId: "api-gateway", x: 350, y: 250 },
+        { componentId: "app-server", x: 530, y: 250 },
+        { componentId: "cache", x: 530, y: 80 },
+        { componentId: "nosql-db", x: 720, y: 200 },
+        { componentId: "sql-db", x: 720, y: 350 },
+        { componentId: "search", x: 880, y: 200 },
+        { componentId: "message-queue", x: 530, y: 420 },
+        { componentId: "monitoring", x: 880, y: 350 },
+      ],
+      edges: [
+        { source: "dns", target: "cdn" },
+        { source: "dns", target: "load-balancer" },
+        { source: "load-balancer", target: "api-gateway" },
+        { source: "api-gateway", target: "app-server" },
+        { source: "app-server", target: "cache" },
+        { source: "app-server", target: "nosql-db" },
+        { source: "app-server", target: "sql-db" },
+        { source: "app-server", target: "search" },
+        { source: "app-server", target: "message-queue" },
+        { source: "message-queue", target: "nosql-db" },
+        { source: "app-server", target: "monitoring" },
+      ],
+    },
+    tags: ["Ranking", "Comments", "Voting", "Community"],
+  },
+  {
+    id: "airbnb",
+    title: "Airbnb / Booking Platform",
+    difficulty: "Hard",
+    description:
+      "Design a property rental and booking platform like Airbnb that connects hosts with guests for short-term stays. Airbnb has 7+ million active listings across 220 countries with 50 million monthly searches — the core challenges are building a search system that handles complex multi-dimensional queries (location, dates, price, amenities, guest count), implementing a booking and reservation system that prevents double-booking across overlapping date ranges, and building a dynamic pricing algorithm that helps hosts optimize revenue based on seasonality, local events, and comparable listings.",
+    requirements: {
+      readsPerSec: 100000,
+      writesPerSec: 10000,
+      storageGB: 100000,
+      latencyMs: 200,
+      users: "50M DAU",
+    },
+    constraints: [
+      "Search with compound filters: location (geo-radius), date range availability, price range, guest count, amenities, property type",
+      "Calendar-based availability management — hosts block dates, bookings reserve date ranges, no double-booking allowed",
+      "Reservation system with hold-and-confirm pattern: temporarily hold dates during checkout flow (15-min TTL)",
+      "Dynamic pricing suggestions using comparable listings, seasonality patterns, local event calendars, and demand forecasts",
+      "Review system with bilateral reviews (host reviews guest, guest reviews host) revealed simultaneously after both submit",
+      "Multi-currency pricing with real-time exchange rates, host payout in local currency, guest charges in their currency",
+    ],
+    hints: [
+      {
+        title: "Search architecture",
+        content:
+          "Use Elasticsearch with geo_point for location search, date range queries for availability, and filters for amenities/price. Pre-compute availability calendars as bitmaps for fast date-range intersection.",
+      },
+      {
+        title: "Availability management",
+        content:
+          "Store each listing's availability as a calendar in a SQL database. Use row-level locking or optimistic concurrency to prevent double-booking when two guests try to book overlapping dates.",
+      },
+      {
+        title: "Booking flow",
+        content:
+          "Phase 1: Hold the dates in a distributed lock (Redis SETNX with 15-min TTL). Phase 2: Process payment. Phase 3: Confirm booking in SQL and release the lock. On timeout, dates auto-release.",
+      },
+      {
+        title: "Advanced: Search relevance",
+        content:
+          "Airbnb's search ranking combines 100+ features: price competitiveness, host response rate, listing quality score, guest-listing compatibility, and conversion probability. Use a two-stage ranking pipeline: a fast candidate retrieval phase (Elasticsearch with geo + date filters) followed by a machine-learned re-ranking model (gradient boosted trees) that scores the top 1000 candidates.",
+      },
+    ],
+    referenceSolution: {
+      nodes: [
+        { componentId: "dns", x: 50, y: 250 },
+        { componentId: "cdn", x: 200, y: 80 },
+        { componentId: "load-balancer", x: 200, y: 250 },
+        { componentId: "api-gateway", x: 350, y: 250 },
+        { componentId: "app-server", x: 530, y: 250 },
+        { componentId: "cache", x: 530, y: 80 },
+        { componentId: "sql-db", x: 720, y: 150 },
+        { componentId: "nosql-db", x: 720, y: 300 },
+        { componentId: "search", x: 880, y: 150 },
+        { componentId: "object-storage", x: 880, y: 300 },
+        { componentId: "message-queue", x: 530, y: 420 },
+        { componentId: "monitoring", x: 880, y: 420 },
+      ],
+      edges: [
+        { source: "dns", target: "cdn" },
+        { source: "dns", target: "load-balancer" },
+        { source: "cdn", target: "object-storage" },
+        { source: "load-balancer", target: "api-gateway" },
+        { source: "api-gateway", target: "app-server" },
+        { source: "app-server", target: "cache" },
+        { source: "app-server", target: "sql-db" },
+        { source: "app-server", target: "nosql-db" },
+        { source: "app-server", target: "search" },
+        { source: "app-server", target: "message-queue" },
+        { source: "message-queue", target: "nosql-db" },
+        { source: "app-server", target: "monitoring" },
+      ],
+    },
+    tags: ["Search", "Booking", "Geo-spatial", "Marketplace"],
+  },
+  {
+    id: "whatsapp",
+    title: "WhatsApp / Messaging",
+    difficulty: "Hard",
+    description:
+      "Design an end-to-end encrypted messaging platform like WhatsApp that handles 100+ billion messages per day across 2 billion monthly active users. The server never sees plaintext message content — the core challenges are implementing the Signal Protocol for end-to-end encryption with perfect forward secrecy, reliably delivering messages to offline users (store-and-forward), efficiently fanning out messages in group chats (up to 1024 members), and synchronizing message state across multiple linked devices while maintaining encryption guarantees.",
+    requirements: {
+      readsPerSec: 100000,
+      writesPerSec: 200000,
+      storageGB: 500000,
+      latencyMs: 50,
+      users: "2B MAU, 500M DAU",
+    },
+    constraints: [
+      "End-to-end encryption using Signal Protocol — server stores only ciphertext, key exchange via X3DH (Extended Triple Diffie-Hellman)",
+      "Offline message delivery with store-and-forward — messages queued on server until recipient reconnects, then delivered in order",
+      "Group messaging up to 1024 members with Sender Keys protocol for efficient group encryption",
+      "Media sharing with encrypted upload — media encrypted client-side, uploaded to object storage, decryption key sent in message",
+      "Multi-device support (WhatsApp Web/Desktop) with message sync using companion device protocol",
+      "Read receipts, typing indicators, and online presence as ephemeral signals (no persistent storage)",
+    ],
+    hints: [
+      {
+        title: "Connection management",
+        content:
+          "Maintain persistent WebSocket connections from each client to a connection gateway. Store the mapping of user ID → gateway server in Redis for message routing.",
+      },
+      {
+        title: "Message delivery",
+        content:
+          "On send: encrypt client-side, send to server, server queues in recipient's inbox (NoSQL). When recipient is online, push immediately via their WebSocket connection. When offline, store and deliver on reconnect.",
+      },
+      {
+        title: "Group messaging",
+        content:
+          "Use Sender Keys: the sender encrypts the message once with a shared group key, server fans out the ciphertext to all group members. This avoids N separate encryptions per message.",
+      },
+      {
+        title: "Advanced: Multi-device sync",
+        content:
+          "WhatsApp's multi-device architecture treats each device as a separate Signal Protocol client. When sending to a user with 4 linked devices, the sender encrypts the message 4 times (once per device's public key). Each device maintains its own ratchet state. The server stores per-device message queues and delivers independently. This eliminates the need for a primary device to be online.",
+      },
+    ],
+    referenceSolution: {
+      nodes: [
+        { componentId: "dns", x: 50, y: 250 },
+        { componentId: "load-balancer", x: 200, y: 250 },
+        { componentId: "websocket-server", x: 200, y: 100 },
+        { componentId: "app-server", x: 400, y: 250 },
+        { componentId: "cache", x: 400, y: 100 },
+        { componentId: "message-queue", x: 400, y: 400 },
+        { componentId: "nosql-db", x: 600, y: 250 },
+        { componentId: "object-storage", x: 600, y: 100 },
+        { componentId: "monitoring", x: 800, y: 250 },
+      ],
+      edges: [
+        { source: "dns", target: "load-balancer" },
+        { source: "load-balancer", target: "websocket-server" },
+        { source: "websocket-server", target: "app-server" },
+        { source: "app-server", target: "cache" },
+        { source: "app-server", target: "message-queue" },
+        { source: "message-queue", target: "nosql-db" },
+        { source: "app-server", target: "nosql-db" },
+        { source: "app-server", target: "object-storage" },
+        { source: "app-server", target: "monitoring" },
+      ],
+    },
+    tags: ["Encryption", "WebSocket", "Messaging", "Real-time"],
+  },
+  {
+    id: "search-engine",
+    title: "Google Search / Search Engine",
+    difficulty: "Hard",
+    description:
+      "Design a web search engine like Google that crawls billions of web pages, builds an inverted index, ranks results by relevance, and returns the top results in under 200ms. Google processes over 8.5 billion searches per day across an index of hundreds of billions of pages (tens of petabytes) — the core challenges are building and maintaining a distributed inverted index that maps every word to the documents containing it, implementing a ranking algorithm (PageRank + hundreds of signals) that surfaces the most relevant results, and serving queries with sub-200ms latency by scattering the query across thousands of index shards in parallel.",
+    requirements: {
+      readsPerSec: 500000,
+      writesPerSec: 50000,
+      storageGB: 10000000,
+      latencyMs: 200,
+      users: "5B queries/day",
+    },
+    constraints: [
+      "Distributed inverted index sharded across thousands of machines — each shard holds a portion of the web",
+      "PageRank computation over a web graph of 100B+ nodes using iterative MapReduce (converges in 40-50 iterations)",
+      "Query parsing with spell correction, synonym expansion, entity recognition, and intent classification",
+      "Sub-200ms query latency by scatter-gather across index shards with aggressive timeouts (drop slow shards)",
+      "Freshness: crawl and re-index high-priority pages (news sites) within minutes of changes",
+      "Snippet generation — extract the most relevant text fragment from each result page to display in results",
+    ],
+    hints: [
+      {
+        title: "Inverted index",
+        content:
+          "Build an inverted index mapping each term to a sorted list of (docID, frequency, positions). Shard by document (each shard holds the full index for a subset of pages). At query time, scatter the query to all shards and merge results.",
+      },
+      {
+        title: "Ranking signals",
+        content:
+          "Combine hundreds of signals: PageRank (link authority), BM25 (term relevance), freshness, page speed, mobile-friendliness, and user engagement metrics. Use a machine-learned model to weight signals.",
+      },
+      {
+        title: "Crawl and index pipeline",
+        content:
+          "Web crawler discovers pages → message queue → parser extracts text and links → indexer updates inverted index → PageRank recomputes periodically on the link graph.",
+      },
+      {
+        title: "Advanced: Two-phase ranking",
+        content:
+          "Phase 1 (retrieval): Use the inverted index to find candidate documents matching the query terms using BM25 scoring — returns top 1000 candidates per shard. Phase 2 (ranking): A machine-learned model re-ranks candidates using 200+ features (PageRank, click-through rate, query-document embedding similarity). This two-phase approach lets you apply expensive ranking only to promising candidates.",
+      },
+    ],
+    referenceSolution: {
+      nodes: [
+        { componentId: "dns", x: 50, y: 250 },
+        { componentId: "cdn", x: 200, y: 80 },
+        { componentId: "load-balancer", x: 200, y: 250 },
+        { componentId: "api-gateway", x: 350, y: 250 },
+        { componentId: "app-server", x: 530, y: 250 },
+        { componentId: "cache", x: 530, y: 80 },
+        { componentId: "nosql-db", x: 720, y: 150 },
+        { componentId: "search", x: 720, y: 300 },
+        { componentId: "message-queue", x: 530, y: 420 },
+        { componentId: "object-storage", x: 880, y: 150 },
+        { componentId: "stream-processor", x: 720, y: 420 },
+        { componentId: "monitoring", x: 880, y: 300 },
+      ],
+      edges: [
+        { source: "dns", target: "cdn" },
+        { source: "dns", target: "load-balancer" },
+        { source: "load-balancer", target: "api-gateway" },
+        { source: "api-gateway", target: "app-server" },
+        { source: "app-server", target: "cache" },
+        { source: "app-server", target: "search" },
+        { source: "app-server", target: "nosql-db" },
+        { source: "app-server", target: "message-queue" },
+        { source: "message-queue", target: "stream-processor" },
+        { source: "stream-processor", target: "search" },
+        { source: "app-server", target: "object-storage" },
+        { source: "app-server", target: "monitoring" },
+      ],
+    },
+    tags: ["Search", "Indexing", "PageRank", "Distributed"],
+  },
+  {
+    id: "location-service",
+    title: "Yelp / Location-Based Service",
+    difficulty: "Medium",
+    description:
+      "Design a location-based business discovery and review platform like Yelp or Google Places. Users search for businesses by category and proximity, browse photos and reviews, and contribute their own ratings. Yelp indexes over 250 million reviews for 5+ million businesses — the core challenges are building an efficient geospatial index (QuadTree or Geohash) that supports proximity search with category filters, aggregating review scores in real-time as new reviews come in, and serving business detail pages with rich media from a global CDN.",
+    requirements: {
+      readsPerSec: 100000,
+      writesPerSec: 5000,
+      storageGB: 50000,
+      latencyMs: 200,
+      users: "30M DAU",
+    },
+    constraints: [
+      "Geospatial search using QuadTree or Geohash index — find businesses within radius sorted by relevance and distance",
+      "Compound search: category + location + price range + rating + open-now with sub-200ms response",
+      "Review aggregation with Bayesian average rating (accounts for review count, not just mean score)",
+      "Photo storage with thumbnails, CDN serving, and user-uploaded content moderation",
+      "Business profile pages with hours, menu (for restaurants), and real-time busy-times based on check-in data",
+      "Autocomplete for business names and categories with typo tolerance and location-biased results",
+    ],
+    hints: [
+      {
+        title: "Geospatial indexing",
+        content:
+          "Use a QuadTree to partition geographic space. Each leaf node contains businesses within that area. Proximity queries traverse the tree to find nearby leaves, then filter by radius. Alternatively, use Geohash with prefix matching.",
+      },
+      {
+        title: "Search with filters",
+        content:
+          "Use Elasticsearch with geo_distance queries for proximity search. Add filters for category, price range, and open hours. Pre-compute popular searches per geohash cell for instant results.",
+      },
+      {
+        title: "Review aggregation",
+        content:
+          "Cache aggregate ratings in Redis. On new review, update the running average atomically. Use Bayesian average to prevent businesses with few 5-star reviews from outranking those with hundreds of 4.5-star reviews.",
+      },
+      {
+        title: "Advanced: QuadTree sharding",
+        content:
+          "Build a distributed QuadTree where each server owns a geographic partition. Dense areas (Manhattan) get finer-grained partitions than rural areas. A routing layer maps the user's search center to the relevant partition servers. For boundary queries (search radius spans multiple partitions), query adjacent partitions in parallel and merge results.",
+      },
+    ],
+    referenceSolution: {
+      nodes: [
+        { componentId: "dns", x: 50, y: 250 },
+        { componentId: "cdn", x: 200, y: 80 },
+        { componentId: "load-balancer", x: 200, y: 250 },
+        { componentId: "api-gateway", x: 350, y: 250 },
+        { componentId: "app-server", x: 530, y: 250 },
+        { componentId: "cache", x: 530, y: 80 },
+        { componentId: "nosql-db", x: 720, y: 200 },
+        { componentId: "search", x: 720, y: 350 },
+        { componentId: "object-storage", x: 880, y: 200 },
+        { componentId: "monitoring", x: 880, y: 350 },
+      ],
+      edges: [
+        { source: "dns", target: "cdn" },
+        { source: "dns", target: "load-balancer" },
+        { source: "cdn", target: "object-storage" },
+        { source: "load-balancer", target: "api-gateway" },
+        { source: "api-gateway", target: "app-server" },
+        { source: "app-server", target: "cache" },
+        { source: "app-server", target: "nosql-db" },
+        { source: "app-server", target: "search" },
+        { source: "app-server", target: "monitoring" },
+      ],
+    },
+    tags: ["Geo-spatial", "Search", "Reviews", "QuadTree"],
+  },
+  {
+    id: "tiktok",
+    title: "TikTok / Short Video",
+    difficulty: "Hard",
+    description:
+      "Design a short-form video platform like TikTok that serves personalized video feeds to over 1 billion daily active users. TikTok's recommendation engine is its core competitive advantage — it builds interest graphs from watch-time signals (not just social graphs) to surface relevant content even for new users within minutes. The platform processes over 1 billion video views per day with a multi-petabyte content library — the key challenges are building the For You Page (FYP) recommendation algorithm, a high-throughput video transcoding pipeline that processes millions of uploads daily, and a content moderation system that reviews content before publication.",
+    requirements: {
+      readsPerSec: 500000,
+      writesPerSec: 50000,
+      storageGB: 5000000,
+      latencyMs: 100,
+      users: "1B DAU",
+    },
+    constraints: [
+      "For You Page recommendation combining collaborative filtering, content embeddings, and real-time engagement signals",
+      "Video transcoding pipeline: ingest → content moderation → transcode (multiple resolutions/bitrates) → CDN distribution",
+      "Content moderation at upload time — automated detection of policy violations (nudity, violence, misinformation) before publication",
+      "Creator economy features: live gifting, creator fund payouts, branded content marketplace",
+      "Duet and Stitch features requiring frame-accurate video composition on server or client",
+      "Global CDN with regional content regulations — different content availability per country",
+    ],
+    hints: [
+      {
+        title: "Recommendation engine",
+        content:
+          "TikTok's FYP uses an interest graph built from watch-time signals (not social graph). Track: watch duration, replays, shares, comments, follows-from-video. Feed these signals into a real-time stream processor.",
+      },
+      {
+        title: "Video pipeline",
+        content:
+          "Upload to object storage → push processing job to message queue → workers transcode to 360p/720p/1080p → push to CDN. Run content moderation in parallel with transcoding to minimize time-to-publish.",
+      },
+      {
+        title: "Feed serving",
+        content:
+          "Pre-compute a ranked candidate pool per user. On each swipe, serve the next video from the pool. Refresh the pool every few minutes using the latest engagement signals.",
+      },
+      {
+        title: "Advanced: Two-tower recommendation",
+        content:
+          "Use a two-tower neural network: one tower encodes user interests (watch history, engagement patterns), the other encodes video features (visual embeddings, audio, text, hashtags). Compute dot-product similarity to score candidates. Generate candidates from multiple sources: interest graph, trending, geographic, and following — then blend and re-rank using the two-tower model for the final feed.",
+      },
+    ],
+    referenceSolution: {
+      nodes: [
+        { componentId: "dns", x: 50, y: 250 },
+        { componentId: "cdn", x: 200, y: 80 },
+        { componentId: "load-balancer", x: 200, y: 250 },
+        { componentId: "api-gateway", x: 350, y: 250 },
+        { componentId: "app-server", x: 530, y: 250 },
+        { componentId: "cache", x: 530, y: 80 },
+        { componentId: "message-queue", x: 530, y: 420 },
+        { componentId: "nosql-db", x: 720, y: 200 },
+        { componentId: "object-storage", x: 720, y: 80 },
+        { componentId: "search", x: 880, y: 80 },
+        { componentId: "stream-processor", x: 720, y: 420 },
+        { componentId: "monitoring", x: 880, y: 250 },
+      ],
+      edges: [
+        { source: "dns", target: "cdn" },
+        { source: "dns", target: "load-balancer" },
+        { source: "cdn", target: "object-storage" },
+        { source: "load-balancer", target: "api-gateway" },
+        { source: "api-gateway", target: "app-server" },
+        { source: "app-server", target: "cache" },
+        { source: "app-server", target: "message-queue" },
+        { source: "app-server", target: "nosql-db" },
+        { source: "app-server", target: "search" },
+        { source: "message-queue", target: "stream-processor" },
+        { source: "message-queue", target: "object-storage" },
+        { source: "app-server", target: "monitoring" },
+      ],
+    },
+    tags: ["Recommendations", "CDN", "Streaming", "ML"],
+  },
+  {
+    id: "message-queue-design",
+    title: "Distributed Message Queue (Kafka)",
+    difficulty: "Hard",
+    description:
+      "Design a distributed message queue system like Apache Kafka that provides durable, ordered, and high-throughput message delivery between services. Kafka processes trillions of messages per day at companies like LinkedIn, handling 1M+ messages/second per broker — the core challenges are designing a partitioned commit log that supports parallel consumption, implementing consumer group coordination with partition rebalancing, achieving exactly-once semantics through idempotent producers and transactional writes, and maintaining data durability through in-sync replica (ISR) sets with configurable acknowledgment levels.",
+    requirements: {
+      readsPerSec: 1000000,
+      writesPerSec: 1000000,
+      storageGB: 500000,
+      latencyMs: 5,
+      users: "N/A (infrastructure)",
+    },
+    constraints: [
+      "Partitioned commit log — messages within a partition are strictly ordered and assigned monotonic offsets",
+      "Consumer groups with automatic partition assignment — each partition consumed by exactly one consumer in the group",
+      "In-Sync Replica (ISR) set — configurable replication factor (typically 3) with leader-based writes and follower replication",
+      "Exactly-once semantics via idempotent producers (sequence numbers per partition) and transactional writes across partitions",
+      "Log compaction — retain only the latest value per key for changelog/snapshot topics",
+      "Configurable retention: time-based (7 days default) or size-based (per partition log segment cleanup)",
+    ],
+    hints: [
+      {
+        title: "Partitioned log",
+        content:
+          "Model each topic as N partitions. Each partition is an append-only log stored on disk. Producers hash the message key to determine the target partition. This enables parallel writes and ordered consumption per partition.",
+      },
+      {
+        title: "Replication for durability",
+        content:
+          "Each partition has a leader and N-1 follower replicas. Producers write to the leader, followers pull and replicate. The ISR (In-Sync Replica) set tracks which followers are caught up. Configurable acks: 0 (fire-and-forget), 1 (leader only), all (all ISR replicas).",
+      },
+      {
+        title: "Consumer groups",
+        content:
+          "A consumer group coordinator assigns partitions to consumers. When a consumer joins or leaves, trigger a rebalance. Store consumer offsets in an internal __consumer_offsets topic for durability.",
+      },
+      {
+        title: "Advanced: Zero-copy and page cache",
+        content:
+          "Kafka achieves high throughput by leveraging the OS page cache for reads (no application-level cache needed) and zero-copy transfers (sendfile syscall) from disk to network socket. Sequential disk writes are faster than random memory access — Kafka's append-only log exploits this for 800MB/s+ write throughput per broker on commodity SSDs.",
+      },
+    ],
+    referenceSolution: {
+      nodes: [
+        { componentId: "load-balancer", x: 100, y: 250 },
+        { componentId: "app-server", x: 300, y: 250 },
+        { componentId: "nosql-db", x: 500, y: 150 },
+        { componentId: "monitoring", x: 500, y: 350 },
+        { componentId: "distributed-lock", x: 300, y: 100 },
+        { componentId: "service-discovery", x: 300, y: 400 },
+      ],
+      edges: [
+        { source: "load-balancer", target: "app-server" },
+        { source: "app-server", target: "nosql-db" },
+        { source: "app-server", target: "distributed-lock" },
+        { source: "app-server", target: "service-discovery" },
+        { source: "app-server", target: "monitoring" },
+      ],
+    },
+    tags: ["Queue", "Distributed", "Replication", "Streaming"],
+  },
+  {
+    id: "digital-wallet",
+    title: "Digital Wallet / UPI",
+    difficulty: "Hard",
+    description:
+      "Design a digital wallet and P2P payment system like Google Pay, PayTM, or UPI (Unified Payments Interface). India's UPI network processes over 10 billion transactions per month across 350+ banks — the core challenges are maintaining strict financial consistency with double-entry bookkeeping, achieving exactly-once transaction execution through idempotency keys (critical when network timeouts cause retries), implementing distributed locks for concurrent balance updates, and meeting regulatory requirements for transaction audit trails, KYC compliance, and settlement reconciliation with banking partners.",
+    requirements: {
+      readsPerSec: 50000,
+      writesPerSec: 30000,
+      storageGB: 10000,
+      latencyMs: 200,
+      users: "100M DAU",
+    },
+    constraints: [
+      "Exactly-once transaction execution using idempotency keys — retries must return the same result without re-debiting",
+      "Double-entry bookkeeping — every transfer creates a debit on sender and credit on receiver that sum to zero",
+      "Distributed locks for balance updates — prevent race conditions when concurrent transactions hit the same wallet",
+      "KYC (Know Your Customer) compliance with tiered wallet limits based on verification level",
+      "Transaction history with complete audit trail — every state transition logged for regulatory reporting",
+      "Bank settlement reconciliation — daily batch settlement with partner banks, handling discrepancies automatically",
+    ],
+    hints: [
+      {
+        title: "Idempotency first",
+        content:
+          "Every transaction API call must include an idempotency key. Before executing, check if this key was already processed. Store the key and result atomically with the transaction in the same database transaction.",
+      },
+      {
+        title: "Balance management",
+        content:
+          "Use a SQL database with SERIALIZABLE isolation for wallet balances. Use SELECT FOR UPDATE or distributed locks to prevent concurrent transactions from creating negative balances.",
+      },
+      {
+        title: "Transaction state machine",
+        content:
+          "Model each transaction as: initiated → debited → credited → completed (or failed → reversed). Use a message queue for reliable state transitions with compensating transactions on failure.",
+      },
+      {
+        title: "Advanced: Saga with compensation",
+        content:
+          "For P2P transfers: Step 1: Debit sender's wallet (with distributed lock). Step 2: Credit receiver's wallet. If Step 2 fails, execute compensating action (re-credit sender). Use a message queue to orchestrate saga steps. Store the saga state so it can resume after any failure. This achieves eventual consistency while maintaining financial accuracy.",
+      },
+    ],
+    referenceSolution: {
+      nodes: [
+        { componentId: "dns", x: 50, y: 250 },
+        { componentId: "load-balancer", x: 200, y: 250 },
+        { componentId: "api-gateway", x: 350, y: 250 },
+        { componentId: "auth-service", x: 350, y: 100 },
+        { componentId: "rate-limiter", x: 350, y: 420 },
+        { componentId: "app-server", x: 530, y: 250 },
+        { componentId: "cache", x: 530, y: 100 },
+        { componentId: "distributed-lock", x: 530, y: 420 },
+        { componentId: "message-queue", x: 720, y: 420 },
+        { componentId: "sql-db", x: 720, y: 200 },
+        { componentId: "nosql-db", x: 720, y: 100 },
+        { componentId: "monitoring", x: 880, y: 250 },
+      ],
+      edges: [
+        { source: "dns", target: "load-balancer" },
+        { source: "load-balancer", target: "api-gateway" },
+        { source: "api-gateway", target: "auth-service" },
+        { source: "api-gateway", target: "rate-limiter" },
+        { source: "api-gateway", target: "app-server" },
+        { source: "app-server", target: "cache" },
+        { source: "app-server", target: "distributed-lock" },
+        { source: "app-server", target: "sql-db" },
+        { source: "app-server", target: "message-queue" },
+        { source: "message-queue", target: "nosql-db" },
+        { source: "app-server", target: "monitoring" },
+      ],
+    },
+    tags: ["ACID", "Idempotent", "Ledger", "Payments"],
+  },
+  {
+    id: "code-editor",
+    title: "Online Code Editor",
+    difficulty: "Medium",
+    description:
+      "Design an online code editor and execution platform like Replit, CodeSandbox, or VS Code for the Web. The system supports real-time collaborative editing, sandboxed code execution in 50+ programming languages, and a virtual file system per project. Replit serves 20+ million developers — the core challenges are implementing real-time collaboration with conflict resolution (OT/CRDT) across multiple cursors, securely sandboxing user code execution in isolated containers with resource limits (CPU, memory, network), and providing Language Server Protocol (LSP) features (autocomplete, go-to-definition, error diagnostics) with low latency.",
+    requirements: {
+      readsPerSec: 30000,
+      writesPerSec: 20000,
+      storageGB: 50000,
+      latencyMs: 100,
+      users: "10M DAU",
+    },
+    constraints: [
+      "Real-time collaborative editing using OT or CRDT with multi-cursor support and conflict resolution",
+      "Sandboxed code execution in isolated containers (gVisor/Firecracker) with CPU, memory, and network resource limits",
+      "Language Server Protocol (LSP) integration for autocomplete, diagnostics, go-to-definition across 50+ languages",
+      "Virtual file system per project with version history and git integration",
+      "Terminal emulation with PTY (pseudo-terminal) forwarding over WebSocket",
+      "Instant project boot — sub-5-second cold start using pre-warmed container pools and filesystem snapshots",
+    ],
+    hints: [
+      {
+        title: "Collaboration layer",
+        content:
+          "Use a WebSocket server for real-time sync. Implement OT (Operational Transformation) or CRDT for conflict-free concurrent edits. Broadcast cursor positions and selections to all collaborators.",
+      },
+      {
+        title: "Sandboxed execution",
+        content:
+          "Run user code in lightweight VMs (Firecracker) or sandboxed containers (gVisor). Pre-warm a pool of containers per language to minimize cold-start latency. Enforce strict resource limits and network isolation.",
+      },
+      {
+        title: "File system design",
+        content:
+          "Use object storage for persistent project files with a NoSQL metadata database. Cache active project files in memory on the execution container for fast reads. Sync changes back to object storage on save.",
+      },
+      {
+        title: "Advanced: Snapshot and restore",
+        content:
+          "Use filesystem snapshots (overlayfs) to create instant project forks. Pre-build base images for each language with common dependencies pre-installed. On project open, layer the user's files on top of the base image using an overlay filesystem — this gives sub-second project boot times instead of installing dependencies from scratch.",
+      },
+    ],
+    referenceSolution: {
+      nodes: [
+        { componentId: "dns", x: 50, y: 250 },
+        { componentId: "cdn", x: 200, y: 80 },
+        { componentId: "load-balancer", x: 200, y: 250 },
+        { componentId: "api-gateway", x: 350, y: 250 },
+        { componentId: "websocket-server", x: 350, y: 420 },
+        { componentId: "app-server", x: 530, y: 250 },
+        { componentId: "cache", x: 530, y: 80 },
+        { componentId: "message-queue", x: 530, y: 420 },
+        { componentId: "nosql-db", x: 720, y: 250 },
+        { componentId: "object-storage", x: 720, y: 80 },
+        { componentId: "monitoring", x: 880, y: 250 },
+      ],
+      edges: [
+        { source: "dns", target: "cdn" },
+        { source: "dns", target: "load-balancer" },
+        { source: "load-balancer", target: "api-gateway" },
+        { source: "load-balancer", target: "websocket-server" },
+        { source: "api-gateway", target: "app-server" },
+        { source: "websocket-server", target: "app-server" },
+        { source: "app-server", target: "cache" },
+        { source: "app-server", target: "message-queue" },
+        { source: "app-server", target: "nosql-db" },
+        { source: "app-server", target: "object-storage" },
+        { source: "app-server", target: "monitoring" },
+      ],
+    },
+    tags: ["Collaboration", "Sandbox", "WebSocket", "LSP"],
+  },
+  {
+    id: "cicd-pipeline",
+    title: "CI/CD Pipeline",
+    difficulty: "Medium",
+    description:
+      "Design a continuous integration and continuous deployment platform like GitHub Actions, GitLab CI, or Jenkins. The system orchestrates build pipelines triggered by code commits, runs tests in parallel across isolated environments, stores build artifacts, and deploys to production using strategies like blue-green or canary. GitHub Actions processes millions of workflow runs daily — the core challenges are efficiently scheduling and executing build jobs across a fleet of heterogeneous runners, managing artifact storage and caching for fast builds, and implementing reliable deployment orchestration with automatic rollback on failure detection.",
+    requirements: {
+      readsPerSec: 20000,
+      writesPerSec: 10000,
+      storageGB: 200000,
+      latencyMs: 500,
+      users: "5M DAU",
+    },
+    constraints: [
+      "Pipeline orchestration: define workflows as DAGs (directed acyclic graphs) of jobs with dependency edges",
+      "Parallel test execution across isolated runners — scale runner fleet dynamically based on queue depth",
+      "Build caching: cache dependencies (node_modules, Maven repo) and Docker layers across runs for 3-10x speedup",
+      "Artifact storage with retention policies — store build outputs, test reports, and coverage data",
+      "Deployment strategies: blue-green (instant switch), canary (gradual rollout with health checks), rolling update",
+      "Automatic rollback on deployment failure — detect health check failures and revert to the previous known-good version",
+    ],
+    hints: [
+      {
+        title: "Job scheduling",
+        content:
+          "Use a message queue with priority lanes for different job types. A scheduler service parses the workflow DAG, resolves dependencies, and enqueues jobs as their dependencies complete.",
+      },
+      {
+        title: "Runner management",
+        content:
+          "Runners pull jobs from the queue, execute in isolated containers, and report results. Use auto-scaling (scale runners based on queue depth) with a minimum warm pool to avoid cold-start delays.",
+      },
+      {
+        title: "Build caching",
+        content:
+          "Cache dependencies in object storage keyed by lock-file hash. On each build, check if a cache exists for the current dependency set. This can reduce build times by 3-10x for dependency-heavy projects.",
+      },
+      {
+        title: "Advanced: Canary deployments",
+        content:
+          "Deploy the new version to 5% of traffic (canary). Monitor error rates, latency p99, and custom health metrics for 10 minutes. If metrics stay within thresholds, gradually increase to 25% → 50% → 100%. If any metric degrades, automatically roll back to the previous version and notify the team. Store deployment state in a SQL database for auditability.",
+      },
+    ],
+    referenceSolution: {
+      nodes: [
+        { componentId: "load-balancer", x: 100, y: 250 },
+        { componentId: "api-gateway", x: 250, y: 250 },
+        { componentId: "app-server", x: 420, y: 250 },
+        { componentId: "cache", x: 420, y: 80 },
+        { componentId: "message-queue", x: 420, y: 420 },
+        { componentId: "sql-db", x: 620, y: 250 },
+        { componentId: "object-storage", x: 620, y: 80 },
+        { componentId: "task-scheduler", x: 620, y: 420 },
+        { componentId: "monitoring", x: 820, y: 250 },
+      ],
+      edges: [
+        { source: "load-balancer", target: "api-gateway" },
+        { source: "api-gateway", target: "app-server" },
+        { source: "app-server", target: "cache" },
+        { source: "app-server", target: "message-queue" },
+        { source: "app-server", target: "sql-db" },
+        { source: "message-queue", target: "task-scheduler" },
+        { source: "task-scheduler", target: "object-storage" },
+        { source: "app-server", target: "monitoring" },
+      ],
+    },
+    tags: ["Pipeline", "Deployment", "Orchestration", "Caching"],
+  },
 ];
 
 export function getProblemById(id: string): Problem | undefined {
