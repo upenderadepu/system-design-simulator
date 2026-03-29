@@ -40,11 +40,27 @@ export interface CustomEdgeData {
   [key: string]: unknown;
 }
 
+export interface CanvasTab {
+  id: string;
+  label: string;
+  nodes: Node[];
+  edges: Edge[];
+  readOnly?: boolean;
+}
+
 interface CanvasState {
   nodes: Node[];
   edges: Edge[];
   selectedNodeId: string | null;
   selectedEdgeId: string | null;
+
+  // Tab system
+  tabs: CanvasTab[];
+  activeTabId: string;
+  addTab: (tab: CanvasTab) => void;
+  switchTab: (tabId: string) => void;
+  closeTab: (tabId: string) => void;
+  renameTab: (tabId: string, label: string) => void;
 
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
@@ -68,6 +84,84 @@ export const useCanvasStore = create<CanvasState>()(
       edges: [],
       selectedNodeId: null,
       selectedEdgeId: null,
+
+      // Tab system — "my-design" is the default tab
+      tabs: [{ id: "my-design", label: "My Design", nodes: [], edges: [] }],
+      activeTabId: "my-design",
+
+      addTab: (tab) => {
+        set((state) => {
+          // Save current tab state before switching
+          const updatedTabs = state.tabs.map((t) =>
+            t.id === state.activeTabId ? { ...t, nodes: state.nodes, edges: state.edges } : t
+          );
+          // Check if tab already exists (reuse it)
+          const existing = updatedTabs.find((t) => t.id === tab.id);
+          if (existing) {
+            return {
+              tabs: updatedTabs.map((t) => (t.id === tab.id ? { ...t, ...tab } : t)),
+              activeTabId: tab.id,
+              nodes: tab.nodes,
+              edges: tab.edges,
+              selectedNodeId: null,
+              selectedEdgeId: null,
+            };
+          }
+          return {
+            tabs: [...updatedTabs, tab],
+            activeTabId: tab.id,
+            nodes: tab.nodes,
+            edges: tab.edges,
+            selectedNodeId: null,
+            selectedEdgeId: null,
+          };
+        });
+      },
+
+      switchTab: (tabId) => {
+        set((state) => {
+          const target = state.tabs.find((t) => t.id === tabId);
+          if (!target || tabId === state.activeTabId) return state;
+          // Save current tab state
+          const updatedTabs = state.tabs.map((t) =>
+            t.id === state.activeTabId ? { ...t, nodes: state.nodes, edges: state.edges } : t
+          );
+          return {
+            tabs: updatedTabs,
+            activeTabId: tabId,
+            nodes: target.nodes,
+            edges: target.edges,
+            selectedNodeId: null,
+            selectedEdgeId: null,
+          };
+        });
+      },
+
+      closeTab: (tabId) => {
+        set((state) => {
+          if (tabId === "my-design") return state; // Can't close the main tab
+          const remaining = state.tabs.filter((t) => t.id !== tabId);
+          if (state.activeTabId === tabId) {
+            // Switch to my-design tab
+            const myDesign = remaining.find((t) => t.id === "my-design") ?? remaining[0];
+            return {
+              tabs: remaining,
+              activeTabId: myDesign.id,
+              nodes: myDesign.nodes,
+              edges: myDesign.edges,
+              selectedNodeId: null,
+              selectedEdgeId: null,
+            };
+          }
+          return { tabs: remaining };
+        });
+      },
+
+      renameTab: (tabId, label) => {
+        set((state) => ({
+          tabs: state.tabs.map((t) => (t.id === tabId ? { ...t, label } : t)),
+        }));
+      },
 
       onNodesChange: (changes) => {
         set((state) => ({
@@ -135,6 +229,8 @@ export const useCanvasStore = create<CanvasState>()(
       partialize: (state) => ({
         nodes: state.nodes,
         edges: state.edges,
+        tabs: state.tabs,
+        activeTabId: state.activeTabId,
       }),
     }
   )

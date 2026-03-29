@@ -17,6 +17,7 @@ import { edgeTypes } from "./edges/edgeTypes";
 import { useCanvasStore, type ComponentNodeData } from "@/store/canvasStore";
 import { getComponentById } from "@/data/components";
 import { Layers } from "lucide-react";
+import { CanvasTabBar } from "./CanvasTabBar";
 
 export function DesignCanvas() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -119,8 +120,10 @@ export function DesignCanvas() {
   const isEmpty = nodes.length === 0;
 
   return (
-    <div ref={reactFlowWrapper} className="relative flex-1">
+    <div ref={reactFlowWrapper} className="relative flex-1 flex flex-col">
+      <CanvasTabBar />
       <ReactFlow
+        className="flex-1 bg-zinc-950"
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
@@ -136,7 +139,6 @@ export function DesignCanvas() {
         defaultEdgeOptions={{ type: "animated" }}
         fitView
         proOptions={{ hideAttribution: true }}
-        className="bg-zinc-950"
       >
         <Background
           variant={BackgroundVariant.Dots}

@@ -24,7 +24,6 @@ import { useAppStore } from "@/store/appStore";
 import { useCanvasStore } from "@/store/canvasStore";
 import { PROBLEMS } from "@/data/problems";
 import { useCustomProblemsStore } from "@/store/customProblemsStore";
-import { useSavedDesignsStore } from "@/store/savedDesignsStore";
 import { type Node, type Edge, useReactFlow } from "@xyflow/react";
 import { getComponentById } from "@/data/components";
 import type { ComponentNodeData } from "@/store/canvasStore";
@@ -123,18 +122,9 @@ export function TopBar({ onSimulate, onScore, onClearCanvas, onSave, onLoad, onS
     const problem = PROBLEMS.find((p) => p.id === selectedProblemId);
     if (!problem) return;
 
-    const { nodes } = useCanvasStore.getState();
-    if (nodes.length > 0) {
-      // Auto-save current design before overwriting
-      useSavedDesignsStore.getState().saveDesign(`${problem.title} — My Design (auto-saved)`);
-      useAppStore.getState().showToast("Your design was auto-saved before loading reference", "info");
-    }
-
-    onClearCanvas();
-
-    // Use index-based keys so duplicate componentIds get unique map entries
+    // Build reference nodes
     const nodeIdMap = new Map<string, string>();
-    const newNodes: Node<ComponentNodeData>[] = [];
+    const refNodes: Node<ComponentNodeData>[] = [];
 
     problem.referenceSolution.nodes.forEach((ref, index) => {
       const comp = getComponentById(ref.componentId);
@@ -143,7 +133,7 @@ export function TopBar({ onSimulate, onScore, onClearCanvas, onSave, onLoad, onS
       const nodeId = `${comp.id}-ref-${index}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
       nodeIdMap.set(`${ref.componentId}-${index}`, nodeId);
 
-      newNodes.push({
+      refNodes.push({
         id: nodeId,
         type: "component",
         position: { x: ref.x, y: ref.y },
@@ -160,15 +150,12 @@ export function TopBar({ onSimulate, onScore, onClearCanvas, onSave, onLoad, onS
       });
     });
 
-    // Build edges. Edge source/target reference componentIds. Find the first
-    // matching node for each componentId (handles the common unique-id case and
-    // gracefully picks one when there are duplicates).
-    const newEdges: Edge[] = [];
+    const refEdges: Edge[] = [];
     for (const ref of problem.referenceSolution.edges) {
       const sourceId = findNodeIdByComponent(nodeIdMap, ref.source);
       const targetId = findNodeIdByComponent(nodeIdMap, ref.target);
       if (sourceId && targetId) {
-        newEdges.push({
+        refEdges.push({
           id: `e-${sourceId}-${targetId}`,
           source: sourceId,
           target: targetId,
@@ -177,13 +164,17 @@ export function TopBar({ onSimulate, onScore, onClearCanvas, onSave, onLoad, onS
       }
     }
 
-    // Batch nodes and edges in a single state update to avoid race conditions
-    const { nodes: currentNodes, edges: currentEdges } = useCanvasStore.getState();
-    useCanvasStore.setState({
-      nodes: [...currentNodes, ...newNodes],
-      edges: [...currentEdges, ...newEdges],
+    // Open reference in a NEW tab — user's design stays in "My Design" tab
+    useCanvasStore.getState().addTab({
+      id: `ref-${problem.id}`,
+      label: `${problem.title} (Reference)`,
+      nodes: refNodes,
+      edges: refEdges,
+      readOnly: true,
     });
-  }, [selectedProblemId, onClearCanvas]);
+
+    useAppStore.getState().showToast("Reference opened in new tab — your design is safe", "success");
+  }, [selectedProblemId]);
 
   return (
     <header className="flex h-12 shrink-0 items-center justify-between border-b border-zinc-800 bg-zinc-900 px-3">
@@ -268,8 +259,6 @@ export function TopBar({ onSimulate, onScore, onClearCanvas, onSave, onLoad, onS
                     onClick={() => {
                       setSelectedProblem(problem.id);
                       setDropdownOpen(false);
-                      // Auto-load reference solution when selecting a problem
-                      setTimeout(() => loadReference(), 50);
                     }}
                     className={`flex w-full items-center px-3 py-1.5 text-left text-xs transition-colors hover:bg-zinc-700 ${
                       problem.id === selectedProblemId
