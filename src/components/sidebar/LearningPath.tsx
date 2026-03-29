@@ -150,10 +150,13 @@ export function LearningPath() {
                     const isSelected = pid === selectedProblemId;
 
                     return (
-                      <button
+                      <div
                         key={pid}
+                        role="button"
+                        tabIndex={0}
                         onClick={() => setSelectedProblem(pid)}
-                        className={`flex w-full flex-col gap-1 rounded-md px-2.5 py-2 text-left transition-colors ${
+                        onKeyDown={(e) => { if (e.key === "Enter") setSelectedProblem(pid); }}
+                        className={`flex w-full cursor-pointer flex-col gap-1 rounded-md px-2.5 py-2 text-left transition-colors ${
                           isSelected
                             ? "border border-zinc-700 bg-zinc-800"
                             : isRecommended
@@ -219,7 +222,7 @@ export function LearningPath() {
                             ))}
                           </div>
                         )}
-                      </button>
+                      </div>
                     );
                   })}
                 </div>
