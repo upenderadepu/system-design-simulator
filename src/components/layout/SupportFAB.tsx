@@ -8,7 +8,8 @@ interface SupportFABProps {
 
 /**
  * Circular "Buy me a coffee" floating action button.
- * The label arches across the top half only; the Coffee icon sits in the middle.
+ * Colors follow the site's cyan accent palette. Label arches across a 210° arc
+ * so it never clips; Coffee icon stays centered.
  *
  * Mobile: bottom-right corner. Desktop: sits to the left of the minimap.
  */
@@ -16,11 +17,11 @@ export function SupportFAB({ onClick }: SupportFABProps) {
   return (
     <button
       onClick={onClick}
-      className="group fixed bottom-5 right-4 z-30 flex h-24 w-24 items-center justify-center rounded-full border border-amber-300/40 bg-gradient-to-br from-amber-400 via-amber-500 to-orange-500 text-zinc-950 shadow-lg shadow-amber-500/30 ring-1 ring-black/5 transition-transform hover:-translate-y-0.5 hover:scale-[1.04] active:translate-y-0 md:right-[172px]"
+      className="group fixed bottom-5 right-4 z-30 flex h-20 w-20 items-center justify-center rounded-full border border-cyan-300/50 bg-gradient-to-br from-cyan-400 via-cyan-500 to-cyan-600 text-zinc-950 shadow-lg shadow-cyan-500/30 ring-1 ring-black/10 transition-transform hover:-translate-y-0.5 hover:scale-[1.04] active:translate-y-0 md:right-[172px]"
       title="Buy me a coffee — support the project"
       aria-label="Buy me a coffee"
     >
-      {/* Arched label across the top half */}
+      {/* Arched label — 210° arc along the bottom, text reads upright */}
       <svg
         viewBox="0 0 100 100"
         className="pointer-events-none absolute inset-0 h-full w-full"
@@ -28,21 +29,24 @@ export function SupportFAB({ onClick }: SupportFABProps) {
       >
         <defs>
           <path
-            id="support-fab-arc-top"
-            d="M 14,50 A 36,36 0 0,1 86,50"
+            id="support-fab-arc-bottom"
+            d="M 15.23,40.68 A 36,36 0 1,1 84.77,40.68"
             fill="none"
           />
         </defs>
         <text
-          className="fill-zinc-950"
           style={{
-            fontSize: "11px",
+            fontSize: "12px",
             fontWeight: 900,
-            letterSpacing: "0.16em",
+            letterSpacing: "0.1em",
+            fill: "#09090b",
+            stroke: "#09090b",
+            strokeWidth: "0.6",
+            paintOrder: "stroke fill",
           }}
         >
           <textPath
-            href="#support-fab-arc-top"
+            href="#support-fab-arc-bottom"
             startOffset="50%"
             textAnchor="middle"
           >
@@ -51,10 +55,10 @@ export function SupportFAB({ onClick }: SupportFABProps) {
         </text>
       </svg>
 
-      {/* Centered Coffee icon */}
+      {/* Centered Coffee icon — smaller so text reads as the hero */}
       <Coffee
-        className="relative z-10 h-7 w-7 transition-transform group-hover:-rotate-6 group-hover:scale-110"
-        strokeWidth={2.5}
+        className="relative z-10 h-5 w-5 transition-transform group-hover:-rotate-6 group-hover:scale-110"
+        strokeWidth={2.75}
       />
     </button>
   );

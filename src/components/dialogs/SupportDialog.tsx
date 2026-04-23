@@ -64,8 +64,8 @@ export function SupportDialog({ open, onClose }: SupportDialogProps) {
       <div className="relative z-10 my-4 w-full max-w-sm overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 shadow-2xl">
         {/* Decorative gradient band */}
         <div className="relative h-20 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-amber-500/25 via-orange-500/10 to-rose-500/5" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_120%,rgba(251,191,36,0.3),transparent_60%)]" />
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/25 via-sky-500/10 to-blue-500/5" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_120%,rgba(34,211,238,0.3),transparent_60%)]" />
           <button
             onClick={onClose}
             className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-zinc-900/70 text-zinc-400 backdrop-blur transition-colors hover:bg-zinc-800 hover:text-zinc-200"
