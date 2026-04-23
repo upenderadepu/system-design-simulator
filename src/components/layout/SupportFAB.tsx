@@ -8,8 +8,7 @@ interface SupportFABProps {
 
 /**
  * Circular "Buy me a coffee" floating action button.
- * The label curls around the disc (SVG textPath) and slowly rotates.
- * Coffee icon stays centered and still.
+ * The label arches across the top half only; the Coffee icon sits in the middle.
  *
  * Mobile: bottom-right corner. Desktop: sits to the left of the minimap.
  */
@@ -21,30 +20,42 @@ export function SupportFAB({ onClick }: SupportFABProps) {
       title="Buy me a coffee — support the project"
       aria-label="Buy me a coffee"
     >
-      {/* Rotating text ring */}
+      {/* Arched label across the top half */}
       <svg
         viewBox="0 0 100 100"
-        className="pointer-events-none absolute inset-0 h-full w-full animate-[spin_18s_linear_infinite]"
+        className="pointer-events-none absolute inset-0 h-full w-full"
         aria-hidden="true"
       >
         <defs>
           <path
-            id="support-fab-ring"
-            d="M 50,50 m -38,0 a 38,38 0 1,1 76,0 a 38,38 0 1,1 -76,0"
+            id="support-fab-arc-top"
+            d="M 14,50 A 36,36 0 0,1 86,50"
+            fill="none"
           />
         </defs>
         <text
-          className="fill-zinc-950 font-bold"
-          style={{ fontSize: "10px", letterSpacing: "0.18em" }}
+          className="fill-zinc-950"
+          style={{
+            fontSize: "11px",
+            fontWeight: 900,
+            letterSpacing: "0.16em",
+          }}
         >
-          <textPath href="#support-fab-ring" startOffset="0">
-            BUY ME A COFFEE · BUY ME A COFFEE ·
+          <textPath
+            href="#support-fab-arc-top"
+            startOffset="50%"
+            textAnchor="middle"
+          >
+            BUY ME A COFFEE
           </textPath>
         </text>
       </svg>
 
       {/* Centered Coffee icon */}
-      <Coffee className="relative z-10 h-7 w-7 transition-transform group-hover:-rotate-6 group-hover:scale-110" />
+      <Coffee
+        className="relative z-10 h-7 w-7 transition-transform group-hover:-rotate-6 group-hover:scale-110"
+        strokeWidth={2.5}
+      />
     </button>
   );
 }
