@@ -80,7 +80,7 @@ export function exportAsJSON(
   problemName: string
 ): void {
   const filename = `${slugify(problemName)}-hld-${getTimestamp()}.json`;
-  const payload = JSON.stringify({ problemName, nodes, edges }, null, 2);
+  const payload = JSON.stringify({ name: problemName, nodes, edges }, null, 2);
   const blob = new Blob([payload], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   triggerDownload(url, filename);
