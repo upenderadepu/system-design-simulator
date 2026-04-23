@@ -12,6 +12,9 @@ import { useCanvasStore, type ComponentNodeData } from "@/store/canvasStore";
 import { useSimulationStore } from "@/store/simulationStore";
 import { runSimulation } from "@/engine/simulator";
 import { scoreDesign } from "@/scoring/scorer";
+import { PROBLEMS } from "@/data/problems";
+import { getComponentById } from "@/data/components";
+import type { Edge } from "@xyflow/react";
 import { Toast } from "@/components/ui/Toast";
 import { SaveDialog } from "@/components/dialogs/SaveDialog";
 import { LoadDialog } from "@/components/dialogs/LoadDialog";
@@ -117,6 +120,76 @@ export function AppShell() {
     useAppStore.getState().showToast("Canvas cleared", "info");
   }, []);
 
+  const handlePickProblem = useCallback(() => {
+    useAppStore.getState().setActiveLeftTab("problems");
+    if (isMobile) setMobileSidebarOpen(true);
+    else useAppStore.getState().setLeftSidebarOpen(true);
+  }, [isMobile]);
+
+  const handleLoadReference = useCallback(() => {
+    const problemId = useAppStore.getState().selectedProblemId;
+    const problem = PROBLEMS.find((p) => p.id === problemId);
+    if (!problem) {
+      useAppStore.getState().showToast("Pick a problem first", "info");
+      handlePickProblem();
+      return;
+    }
+
+    const nodeIdMap = new Map<string, string>();
+    const refNodes: Node<ComponentNodeData>[] = [];
+
+    problem.referenceSolution.nodes.forEach((ref, index) => {
+      const comp = getComponentById(ref.componentId);
+      if (!comp) return;
+      const nodeId = `${comp.id}-ref-${index}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+      nodeIdMap.set(`${ref.componentId}-${index}`, nodeId);
+      refNodes.push({
+        id: nodeId,
+        type: "component",
+        position: { x: ref.x, y: ref.y },
+        data: {
+          componentId: comp.id,
+          label: comp.label,
+          icon: comp.icon,
+          category: comp.category,
+          replicas: 1,
+          maxQPS: comp.maxQPS,
+          latencyMs: comp.latencyMs,
+          scalable: comp.scalable,
+        },
+      });
+    });
+
+    const refEdges: Edge[] = [];
+    for (const ref of problem.referenceSolution.edges) {
+      const findIdByComponent = (cid: string) => {
+        for (const [key, value] of nodeIdMap) {
+          if (key.startsWith(`${cid}-`)) return value;
+        }
+        return undefined;
+      };
+      const sourceId = findIdByComponent(ref.source);
+      const targetId = findIdByComponent(ref.target);
+      if (sourceId && targetId) {
+        refEdges.push({
+          id: `e-${sourceId}-${targetId}`,
+          source: sourceId,
+          target: targetId,
+          type: "animated",
+        });
+      }
+    }
+
+    useCanvasStore.getState().addTab({
+      id: `ref-${problem.id}`,
+      label: `${problem.title} (Reference)`,
+      nodes: refNodes,
+      edges: refEdges,
+      readOnly: true,
+    });
+    useAppStore.getState().showToast("Reference opened in new tab", "success");
+  }, [handlePickProblem]);
+
   // Keyboard shortcuts
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -196,7 +269,11 @@ export function AppShell() {
             variant="desktop"
           />
 
-          <DesignCanvas />
+          <DesignCanvas
+            onPickProblem={handlePickProblem}
+            onLoadReference={handleLoadReference}
+            onStartInterview={() => setInterviewDialogOpen(true)}
+          />
 
           {/* Desktop inline right panel (hidden on mobile) */}
           <RightPanel open={rightPanelOpen} onSimulate={handleSimulate} variant="desktop" />

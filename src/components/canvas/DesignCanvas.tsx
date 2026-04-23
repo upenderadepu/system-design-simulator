@@ -17,12 +17,18 @@ import { edgeTypes } from "./edges/edgeTypes";
 import { useCanvasStore, type ComponentNodeData } from "@/store/canvasStore";
 import { usePenStore } from "@/store/penStore";
 import { getComponentById } from "@/data/components";
-import { Layers } from "lucide-react";
+import { BookOpen, GraduationCap, Layers, MousePointer2, Sparkles } from "lucide-react";
 import { CanvasTabBar } from "./CanvasTabBar";
 import { PenOverlay } from "./PenOverlay";
 import { PenToolbar } from "./PenToolbar";
 
-export function DesignCanvas() {
+interface DesignCanvasProps {
+  onPickProblem?: () => void;
+  onLoadReference?: () => void;
+  onStartInterview?: () => void;
+}
+
+export function DesignCanvas({ onPickProblem, onLoadReference, onStartInterview }: DesignCanvasProps = {}) {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const { screenToFlowPosition } = useReactFlow();
 
@@ -176,44 +182,99 @@ export function DesignCanvas() {
         <PenToolbar />
       </div>
 
-      {/* Empty state overlay */}
+      {/* Welcome / empty state */}
       {isEmpty && (
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-4 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900">
-              <Layers className="h-7 w-7 text-zinc-500" />
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center px-4 pb-4 md:pb-0">
+          <div className="pointer-events-auto flex w-full max-w-lg flex-col items-center gap-6 text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-transparent shadow-[0_0_40px_-10px_rgba(6,182,212,0.4)]">
+              <Layers className="h-6 w-6 text-cyan-400" />
             </div>
-            <div>
-              <p className="text-sm font-medium text-zinc-300">
-                Design your system
-              </p>
-              <p className="mt-1 max-w-xs text-xs leading-relaxed text-zinc-400">
-                Select a problem from the sidebar, then drag components to build your architecture
+            <div className="space-y-1.5">
+              <h1 className="text-base font-semibold tracking-tight text-zinc-100 md:text-lg">
+                Build an architecture that scales
+              </h1>
+              <p className="mx-auto max-w-sm text-xs leading-relaxed text-zinc-400 md:text-sm">
+                Pick a problem, drop infrastructure components onto the canvas, and get scored the way an interviewer would evaluate you.
               </p>
             </div>
-            <div className="mt-2 flex items-center gap-4 text-xs text-zinc-400">
-              <span className="flex items-center gap-1">
-                <kbd className="rounded border border-zinc-700 bg-zinc-800 px-1 py-0.5 font-mono text-[9px]">
-                  Drag
-                </kbd>
-                to add
+
+            <div className="grid w-full gap-2 sm:grid-cols-3">
+              <QuickStartCard
+                icon={<BookOpen className="h-3.5 w-3.5" />}
+                title="Pick a problem"
+                hint="35 real interview questions"
+                onClick={onPickProblem}
+              />
+              <QuickStartCard
+                icon={<Sparkles className="h-3.5 w-3.5" />}
+                title="Load reference"
+                hint="Open a sample solution"
+                onClick={onLoadReference}
+              />
+              <QuickStartCard
+                icon={<GraduationCap className="h-3.5 w-3.5" />}
+                title="Practice interview"
+                hint="Timed 6-phase mock"
+                onClick={onStartInterview}
+                accent
+              />
+            </div>
+
+            <div className="hidden flex-wrap items-center justify-center gap-3 text-[11px] text-zinc-500 md:flex">
+              <span className="flex items-center gap-1.5">
+                <MousePointer2 className="h-3 w-3" />
+                Drag from the sidebar
               </span>
+              <span className="text-zinc-700">·</span>
               <span className="flex items-center gap-1">
-                <kbd className="rounded border border-zinc-700 bg-zinc-800 px-1 py-0.5 font-mono text-[9px]">
-                  Click
-                </kbd>
-                to select
+                <kbd className="rounded border border-zinc-700 bg-zinc-800 px-1.5 py-0.5 font-mono text-[10px]">⌘E</kbd>
+                export
               </span>
+              <span className="text-zinc-700">·</span>
               <span className="flex items-center gap-1">
-                <kbd className="rounded border border-zinc-700 bg-zinc-800 px-1 py-0.5 font-mono text-[9px]">
-                  ⌫
-                </kbd>
-                to delete
+                <kbd className="rounded border border-zinc-700 bg-zinc-800 px-1.5 py-0.5 font-mono text-[10px]">⌘↵</kbd>
+                simulate
               </span>
             </div>
           </div>
         </div>
       )}
     </div>
+  );
+}
+
+function QuickStartCard({
+  icon,
+  title,
+  hint,
+  onClick,
+  accent,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  hint: string;
+  onClick?: () => void;
+  accent?: boolean;
+}) {
+  if (!onClick) return null;
+  return (
+    <button
+      onClick={onClick}
+      className={`group flex flex-col items-start gap-1.5 rounded-lg border bg-zinc-900/60 p-3 text-left transition-all hover:-translate-y-0.5 hover:bg-zinc-900 ${
+        accent
+          ? "border-cyan-500/30 hover:border-cyan-400/60 hover:shadow-[0_0_24px_-8px_rgba(6,182,212,0.5)]"
+          : "border-zinc-800 hover:border-zinc-700"
+      }`}
+    >
+      <span
+        className={`flex h-6 w-6 items-center justify-center rounded-md ${
+          accent ? "bg-cyan-500/15 text-cyan-400" : "bg-zinc-800 text-zinc-400 group-hover:text-zinc-200"
+        }`}
+      >
+        {icon}
+      </span>
+      <span className="text-xs font-medium text-zinc-200">{title}</span>
+      <span className="text-[11px] leading-tight text-zinc-500">{hint}</span>
+    </button>
   );
 }

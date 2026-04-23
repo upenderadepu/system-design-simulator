@@ -12,6 +12,7 @@ interface AppState {
   selectedProblemId: string;
   leftSidebarOpen: boolean;
   rightPanelOpen: boolean;
+  activeLeftTab: "components" | "problems" | "learn";
   activeRightTab: "properties" | "simulation" | "score" | "capacity" | "tradeoffs";
   theme: "dark" | "light";
   toast: ToastData | null;
@@ -19,6 +20,8 @@ interface AppState {
   setSelectedProblem: (id: string) => void;
   toggleLeftSidebar: () => void;
   toggleRightPanel: () => void;
+  setLeftSidebarOpen: (open: boolean) => void;
+  setActiveLeftTab: (tab: AppState["activeLeftTab"]) => void;
   setActiveRightTab: (tab: AppState["activeRightTab"]) => void;
   toggleTheme: () => void;
   showToast: (message: string, type: ToastType) => void;
@@ -33,6 +36,7 @@ export const useAppStore = create<AppState>()(
       selectedProblemId: "url-shortener",
       leftSidebarOpen: true,
       rightPanelOpen: true,
+      activeLeftTab: "components",
       activeRightTab: "properties",
       theme: "dark",
       toast: null,
@@ -42,6 +46,8 @@ export const useAppStore = create<AppState>()(
         set((s) => ({ leftSidebarOpen: !s.leftSidebarOpen })),
       toggleRightPanel: () =>
         set((s) => ({ rightPanelOpen: !s.rightPanelOpen })),
+      setLeftSidebarOpen: (open) => set({ leftSidebarOpen: open }),
+      setActiveLeftTab: (tab) => set({ activeLeftTab: tab }),
       setActiveRightTab: (tab) => set({ activeRightTab: tab }),
       toggleTheme: () =>
         set((s) => {
