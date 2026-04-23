@@ -21,6 +21,7 @@ import {
   Plus,
   MoreHorizontal,
   Heart,
+  Coffee,
 } from "lucide-react";
 import { useAppStore } from "@/store/appStore";
 import { useCanvasStore } from "@/store/canvasStore";
@@ -520,6 +521,16 @@ export function TopBar({ onSimulate, onScore, onClearCanvas, onSave, onLoad, onS
           <Trophy className="h-3 w-3" />
           <span className="hidden sm:inline">Score</span>
         </Button>
+
+        {/* Buy me a coffee — desktop only (mobile has FAB + overflow menu) */}
+        <button
+          onClick={onOpenSupport}
+          className="hidden h-7 items-center gap-1.5 rounded-md border border-cyan-500/30 bg-cyan-500/10 px-2.5 text-xs font-medium text-cyan-400 transition-colors hover:border-cyan-400/50 hover:bg-cyan-500/15 hover:text-cyan-300 md:flex"
+          title="Buy me a coffee — support the project"
+        >
+          <Coffee className="h-3.5 w-3.5" />
+          <span>Buy me a coffee</span>
+        </button>
 
         <button
           onClick={onToggleRight}
