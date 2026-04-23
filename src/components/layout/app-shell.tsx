@@ -21,6 +21,7 @@ import { LoadDialog } from "@/components/dialogs/LoadDialog";
 import { InterviewBar } from "@/components/interview/InterviewBar";
 import { InterviewStartDialog } from "@/components/interview/InterviewStartDialog";
 import { CreateProblemDialog } from "@/components/dialogs/CreateProblemDialog";
+import { SupportDialog } from "@/components/dialogs/SupportDialog";
 import { useInterviewStore } from "@/store/interviewStore";
 import { useIsMobile } from "@/hooks/useBreakpoint";
 
@@ -39,6 +40,7 @@ export function AppShell() {
   const [loadDialogOpen, setLoadDialogOpen] = useState(false);
   const [interviewDialogOpen, setInterviewDialogOpen] = useState(false);
   const [createProblemDialogOpen, setCreateProblemDialogOpen] = useState(false);
+  const [supportDialogOpen, setSupportDialogOpen] = useState(false);
   const interviewMode = useInterviewStore((s) => s.mode);
   const timerRunning = useInterviewStore((s) => s.timerRunning);
   const tickTimer = useInterviewStore((s) => s.tickTimer);
@@ -257,6 +259,7 @@ export function AppShell() {
           onLoad={handleLoad}
           onStartInterview={() => setInterviewDialogOpen(true)}
           onCreateProblem={() => setCreateProblemDialogOpen(true)}
+          onOpenSupport={() => setSupportDialogOpen(true)}
           onToggleLeft={handleToggleLeft}
           onToggleRight={handleToggleRight}
         />
@@ -358,6 +361,7 @@ export function AppShell() {
         <LoadDialog open={loadDialogOpen} onClose={() => setLoadDialogOpen(false)} />
         <InterviewStartDialog open={interviewDialogOpen} onClose={() => setInterviewDialogOpen(false)} />
         <CreateProblemDialog open={createProblemDialogOpen} onClose={() => setCreateProblemDialogOpen(false)} />
+        <SupportDialog open={supportDialogOpen} onClose={() => setSupportDialogOpen(false)} />
       </div>
     </ReactFlowProvider>
   );
