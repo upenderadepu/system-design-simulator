@@ -522,15 +522,6 @@ export function TopBar({ onSimulate, onScore, onClearCanvas, onSave, onLoad, onS
         </Button>
 
         <button
-          onClick={onOpenSupport}
-          className="group flex h-7 w-7 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-rose-500/10 hover:text-rose-400"
-          title="Support this project"
-          aria-label="Support this project"
-        >
-          <Heart className="h-3.5 w-3.5 transition-all group-hover:fill-rose-400" />
-        </button>
-
-        <button
           onClick={onToggleRight}
           className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
           title="Toggle panel"
