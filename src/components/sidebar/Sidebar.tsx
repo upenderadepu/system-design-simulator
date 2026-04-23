@@ -38,15 +38,15 @@ function SidebarTabs({ onCreateProblem }: { onCreateProblem?: () => void }) {
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="components" className="mt-0 flex-1 min-h-0 overflow-y-auto">
+      <TabsContent value="components" className="mt-0 flex-1 min-h-0 overflow-hidden">
         <ComponentPalette />
       </TabsContent>
 
-      <TabsContent value="problems" className="mt-0 flex-1 min-h-0 overflow-y-auto">
+      <TabsContent value="problems" className="mt-0 flex-1 min-h-0 overflow-hidden">
         <ProblemSelector onCreateProblem={onCreateProblem} />
       </TabsContent>
 
-      <TabsContent value="learn" className="mt-0 flex-1 min-h-0 overflow-y-auto">
+      <TabsContent value="learn" className="mt-0 flex-1 min-h-0 overflow-hidden">
         <LearningPath />
       </TabsContent>
     </Tabs>

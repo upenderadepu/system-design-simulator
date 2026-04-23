@@ -326,38 +326,84 @@ export function TopBar({ onSimulate, onScore, onClearCanvas, onSave, onLoad, onS
           {mobileMoreOpen && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setMobileMoreOpen(false)} />
-              <div className="absolute left-0 top-full z-50 mt-1 w-52 rounded-md border border-zinc-700 bg-zinc-900 py-1 shadow-lg">
+              <div className="absolute left-0 top-full z-50 mt-1 w-60 rounded-md border border-zinc-700 bg-zinc-900 py-1 shadow-lg">
+                {/* Design actions */}
                 {!selectedProblemId.startsWith("custom-") && (
                   <button
-                    onClick={() => {
-                      setMobileMoreOpen(false);
-                      loadReference();
-                    }}
-                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-zinc-300 transition-colors hover:bg-zinc-800"
+                    onClick={() => { setMobileMoreOpen(false); loadReference(); }}
+                    className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-xs text-zinc-300 transition-colors hover:bg-zinc-800"
                   >
                     <Download className="h-3.5 w-3.5 text-zinc-500" />
                     Load reference solution
                   </button>
                 )}
                 <button
-                  onClick={() => {
-                    setMobileMoreOpen(false);
-                    addTextNote();
-                  }}
-                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-zinc-300 transition-colors hover:bg-zinc-800"
+                  onClick={() => { setMobileMoreOpen(false); addTextNote(); }}
+                  className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-xs text-zinc-300 transition-colors hover:bg-zinc-800"
                 >
                   <StickyNote className="h-3.5 w-3.5 text-zinc-500" />
                   Add text note
                 </button>
                 <button
-                  onClick={() => {
-                    setMobileMoreOpen(false);
-                    onStartInterview();
-                  }}
-                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-zinc-300 transition-colors hover:bg-zinc-800"
+                  onClick={() => { setMobileMoreOpen(false); onStartInterview(); }}
+                  className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-xs text-zinc-300 transition-colors hover:bg-zinc-800"
                 >
                   <GraduationCap className="h-3.5 w-3.5 text-zinc-500" />
                   Practice interview
+                </button>
+
+                <div className="my-1 h-px bg-zinc-800" />
+
+                {/* File */}
+                <button
+                  onClick={() => { setMobileMoreOpen(false); onSave(); }}
+                  className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-xs text-zinc-300 transition-colors hover:bg-zinc-800"
+                >
+                  <Save className="h-3.5 w-3.5 text-zinc-500" />
+                  Save design
+                </button>
+                <button
+                  onClick={() => { setMobileMoreOpen(false); onLoad(); }}
+                  className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-xs text-zinc-300 transition-colors hover:bg-zinc-800"
+                >
+                  <FolderOpen className="h-3.5 w-3.5 text-zinc-500" />
+                  Load design
+                </button>
+
+                <div className="my-1 h-px bg-zinc-800" />
+
+                {/* Export */}
+                <button
+                  onClick={() => { setMobileMoreOpen(false); handleExportPng(); }}
+                  className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-xs text-zinc-300 transition-colors hover:bg-zinc-800"
+                >
+                  <ImageIcon className="h-3.5 w-3.5 text-zinc-500" />
+                  Export as PNG
+                </button>
+                <button
+                  onClick={() => { setMobileMoreOpen(false); handleExportSvg(); }}
+                  className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-xs text-zinc-300 transition-colors hover:bg-zinc-800"
+                >
+                  <FileCode2 className="h-3.5 w-3.5 text-zinc-500" />
+                  Export as SVG
+                </button>
+                <button
+                  onClick={() => { setMobileMoreOpen(false); handleExportJson(); }}
+                  className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-xs text-zinc-300 transition-colors hover:bg-zinc-800"
+                >
+                  <FileJson className="h-3.5 w-3.5 text-zinc-500" />
+                  Export as JSON
+                </button>
+
+                <div className="my-1 h-px bg-zinc-800" />
+
+                {/* Danger */}
+                <button
+                  onClick={() => { setMobileMoreOpen(false); onClearCanvas(); }}
+                  className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-xs text-rose-400 transition-colors hover:bg-zinc-800"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  Clear canvas
                 </button>
               </div>
             </>
@@ -366,10 +412,10 @@ export function TopBar({ onSimulate, onScore, onClearCanvas, onSave, onLoad, onS
       </div>
 
       {/* Right section */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 md:gap-2">
         <button
           onClick={onSave}
-          className="flex h-7 items-center gap-1 rounded-md px-2 text-xs text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
+          className="hidden h-7 items-center gap-1 rounded-md px-2 text-xs text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200 md:flex"
           title="Save design (Ctrl+S)"
         >
           <Save className="h-3.5 w-3.5" />
@@ -377,17 +423,17 @@ export function TopBar({ onSimulate, onScore, onClearCanvas, onSave, onLoad, onS
         </button>
         <button
           onClick={onLoad}
-          className="flex h-7 items-center gap-1 rounded-md px-2 text-xs text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
+          className="hidden h-7 items-center gap-1 rounded-md px-2 text-xs text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200 md:flex"
           title="Load design (Ctrl+O)"
         >
           <FolderOpen className="h-3.5 w-3.5" />
           <span className="hidden sm:inline">Load</span>
         </button>
 
-        <div className="h-4 w-px bg-zinc-800" />
+        <div className="hidden h-4 w-px bg-zinc-800 md:block" />
 
-        {/* Export dropdown */}
-        <div className="relative">
+        {/* Export dropdown — desktop only; mobile goes through overflow menu */}
+        <div className="relative hidden md:block">
           <button
             onClick={() => setExportOpen(!exportOpen)}
             className="flex h-7 items-center gap-1 rounded-md px-2 text-xs text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
@@ -434,11 +480,11 @@ export function TopBar({ onSimulate, onScore, onClearCanvas, onSave, onLoad, onS
           )}
         </div>
 
-        <div className="h-4 w-px bg-zinc-800" />
+        <div className="hidden h-4 w-px bg-zinc-800 md:block" />
 
         <button
           onClick={onClearCanvas}
-          className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-rose-400"
+          className="hidden h-7 w-7 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-rose-400 md:flex"
           title="Clear canvas"
         >
           <Trash2 className="h-3.5 w-3.5" />
