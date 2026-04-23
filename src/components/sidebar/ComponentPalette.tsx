@@ -97,9 +97,13 @@ export function ComponentPalette() {
 
   const query = search.toLowerCase().trim();
 
+  const totalMatches = query
+    ? SYSTEM_COMPONENTS.filter((c) => c.label.toLowerCase().includes(query) || c.description.toLowerCase().includes(query)).length
+    : SYSTEM_COMPONENTS.length;
+
   return (
     <div className="flex h-full flex-col">
-      <div className="shrink-0 px-3 pt-3 pb-1">
+      <div className="shrink-0 px-3 pt-3 pb-2">
         <div className="relative">
           <SearchIcon className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-500" />
           <input
@@ -108,9 +112,16 @@ export function ComponentPalette() {
             placeholder="Search components..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-md border border-zinc-700 bg-zinc-800 py-1.5 pl-8 pr-3 text-xs text-zinc-200 placeholder:text-zinc-500 outline-none transition-colors focus:border-cyan-500"
+            className="w-full rounded-md border border-zinc-700 bg-zinc-800 py-2 pl-8 pr-3 text-xs text-zinc-200 placeholder:text-zinc-500 outline-none transition-colors focus:border-cyan-500"
           />
         </div>
+        {query && (
+          <p className="mt-1.5 text-[10px] text-zinc-500">
+            {totalMatches === 0
+              ? "No matches"
+              : `${totalMatches} component${totalMatches === 1 ? "" : "s"} match "${search}"`}
+          </p>
+        )}
       </div>
       <ScrollArea className="flex-1">
       <div className="space-y-4 p-3">
@@ -121,9 +132,15 @@ export function ComponentPalette() {
           if (query !== "" && items.length === 0) return null;
           return (
             <div key={cat.key}>
-              <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                {cat.label} ({items.length})
-              </p>
+              <div className="mb-2 flex items-center gap-2">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-zinc-500">
+                  {cat.label}
+                </p>
+                <span className="flex h-4 min-w-4 items-center justify-center rounded bg-zinc-800 px-1 text-[10px] font-medium tabular-nums text-zinc-500">
+                  {items.length}
+                </span>
+                <div className="h-px flex-1 bg-zinc-800" />
+              </div>
               <TooltipProvider>
               <div className="space-y-0.5">
                 {items.map((item) => {
