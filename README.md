@@ -319,6 +319,34 @@ src/
 
 ---
 
+## ☕ Support
+
+If SystemSim helped you prep for a system design interview, a chai goes a long way to keep it alive and open-source. No pressure — no ads, no paywalls.
+
+[![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-UPI-06B6D4?style=for-the-badge&logo=buymeacoffee&logoColor=white)](#-buy-me-a-coffee)
+
+<h3 id="-buy-me-a-coffee">Buy me a coffee</h3>
+
+<details>
+<summary><b>Click to reveal the UPI QR</b></summary>
+
+<br/>
+
+<p align="center">
+  <img src="public/support-upi-qr.jpg" alt="UPI QR code — vijaygupta1818@ptyes" width="280"/>
+</p>
+
+<p align="center">
+  Scan with any UPI app — Paytm · PhonePe · GPay · BHIM<br/>
+  UPI ID: <code>vijaygupta1818@ptyes</code>
+</p>
+
+</details>
+
+> Prefer the in-app flow? Open the deployed site with <code>?support=1</code> and the support popup opens automatically.
+
+---
+
 ## Contributing
 
 Contributions welcome. Please open an issue first to discuss.

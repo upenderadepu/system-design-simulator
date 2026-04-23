@@ -42,6 +42,19 @@ export function AppShell() {
   const [interviewDialogOpen, setInterviewDialogOpen] = useState(false);
   const [createProblemDialogOpen, setCreateProblemDialogOpen] = useState(false);
   const [supportDialogOpen, setSupportDialogOpen] = useState(false);
+
+  // Auto-open support dialog when URL has ?support=1 (used by the README link)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("support") === "1") {
+      setSupportDialogOpen(true);
+      params.delete("support");
+      const q = params.toString();
+      const next = window.location.pathname + (q ? `?${q}` : "") + window.location.hash;
+      window.history.replaceState({}, "", next);
+    }
+  }, []);
   const interviewMode = useInterviewStore((s) => s.mode);
   const timerRunning = useInterviewStore((s) => s.timerRunning);
   const tickTimer = useInterviewStore((s) => s.tickTimer);
