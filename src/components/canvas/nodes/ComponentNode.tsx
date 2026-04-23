@@ -101,7 +101,7 @@ function ComponentNodeInner({ id, data, selected }: NodeProps<ComponentNode>) {
           />
         ) : (
           <span
-            className={`max-w-[80px] truncate text-[11px] font-medium text-zinc-200 ${isCustom ? "cursor-text" : ""}`}
+            className={`max-w-[96px] whitespace-normal break-words text-center text-[11px] font-medium leading-tight text-zinc-200 ${isCustom ? "cursor-text" : ""}`}
             onDoubleClick={handleDoubleClick}
           >
             {nodeData.label}

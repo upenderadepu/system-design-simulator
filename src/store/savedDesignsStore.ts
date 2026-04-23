@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { useCanvasStore, type ComponentNodeData } from "./canvasStore";
 import { useAppStore } from "./appStore";
+import { usePenStore, type Stroke } from "./penStore";
 import { PROBLEMS } from "@/data/problems";
 
 export interface SerializedComponentData {
@@ -43,6 +44,7 @@ export interface SavedDesign {
   nodes: SerializedNode[];
   edges: SerializedEdge[];
   annotations: string[];
+  strokes: Stroke[];
   createdAt: string;
   updatedAt: string;
 }
@@ -113,6 +115,7 @@ export const useSavedDesignsStore = create<SavedDesignsState>()(
 
       saveDesign: (name: string) => {
         const { nodes, edges } = useCanvasStore.getState();
+        const { strokes } = usePenStore.getState();
         const problemId = useAppStore.getState().selectedProblemId;
         const now = new Date().toISOString();
         const id = `design-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -124,6 +127,7 @@ export const useSavedDesignsStore = create<SavedDesignsState>()(
           nodes: serializeNodes(nodes),
           edges: serializeEdges(edges),
           annotations: [],
+          strokes,
           createdAt: now,
           updatedAt: now,
         };
@@ -168,6 +172,8 @@ export const useSavedDesignsStore = create<SavedDesignsState>()(
           })),
           selectedNodeId: null,
         });
+
+        usePenStore.getState().setStrokes(design.strokes ?? []);
 
         // Restore problem selection if it exists
         if (design.problemId) {
@@ -214,6 +220,7 @@ export const useSavedDesignsStore = create<SavedDesignsState>()(
             nodes: parsed.nodes,
             edges: parsed.edges,
             annotations: parsed.annotations ?? [],
+            strokes: parsed.strokes ?? [],
             createdAt: now,
             updatedAt: now,
           };

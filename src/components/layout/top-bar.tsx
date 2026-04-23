@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { useAppStore } from "@/store/appStore";
 import { useCanvasStore } from "@/store/canvasStore";
+import { usePenStore } from "@/store/penStore";
 import { PROBLEMS } from "@/data/problems";
 import { useCustomProblemsStore } from "@/store/customProblemsStore";
 import { type Node, type Edge, useReactFlow } from "@xyflow/react";
@@ -96,11 +97,12 @@ export function TopBar({ onSimulate, onScore, onClearCanvas, onSave, onLoad, onS
     setExportOpen(false);
     const name = currentProblem?.title ?? "design";
     const { nodes, edges } = useCanvasStore.getState();
-    if (nodes.length === 0) {
+    const { strokes } = usePenStore.getState();
+    if (nodes.length === 0 && strokes.length === 0) {
       useAppStore.getState().showToast("Nothing to export", "info");
       return;
     }
-    exportAsJSON(nodes, edges, name);
+    exportAsJSON(nodes, edges, name, strokes);
     useAppStore.getState().showToast("Exported as JSON", "success");
   }, [currentProblem]);
 

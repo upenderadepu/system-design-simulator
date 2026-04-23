@@ -1,5 +1,6 @@
 import { toPng, toSvg } from "html-to-image";
 import type { Node, Edge } from "@xyflow/react";
+import type { Stroke } from "@/store/penStore";
 
 function getTimestamp(): string {
   const d = new Date();
@@ -77,10 +78,15 @@ export async function exportAsSvg(problemName: string): Promise<void> {
 export function exportAsJSON(
   nodes: Node[],
   edges: Edge[],
-  problemName: string
+  problemName: string,
+  strokes: Stroke[] = []
 ): void {
   const filename = `${slugify(problemName)}-hld-${getTimestamp()}.json`;
-  const payload = JSON.stringify({ name: problemName, nodes, edges }, null, 2);
+  const payload = JSON.stringify(
+    { name: problemName, nodes, edges, strokes },
+    null,
+    2
+  );
   const blob = new Blob([payload], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   triggerDownload(url, filename);

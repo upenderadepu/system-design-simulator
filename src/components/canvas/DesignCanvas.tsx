@@ -15,9 +15,12 @@ import "@xyflow/react/dist/style.css";
 import { nodeTypes } from "./nodes/nodeTypes";
 import { edgeTypes } from "./edges/edgeTypes";
 import { useCanvasStore, type ComponentNodeData } from "@/store/canvasStore";
+import { usePenStore } from "@/store/penStore";
 import { getComponentById } from "@/data/components";
 import { Layers } from "lucide-react";
 import { CanvasTabBar } from "./CanvasTabBar";
+import { PenOverlay } from "./PenOverlay";
+import { PenToolbar } from "./PenToolbar";
 
 export function DesignCanvas() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -32,6 +35,8 @@ export function DesignCanvas() {
   const updateNodeData = useCanvasStore((s) => s.updateNodeData);
   const setSelectedNode = useCanvasStore((s) => s.setSelectedNode);
   const setSelectedEdge = useCanvasStore((s) => s.setSelectedEdge);
+  const penMode = usePenStore((s) => s.mode);
+  const penActive = penMode !== "off";
 
   // Listen for text node edits and persist them to the store
   useEffect(() => {
@@ -122,8 +127,9 @@ export function DesignCanvas() {
   return (
     <div ref={reactFlowWrapper} className="relative flex-1 flex flex-col">
       <CanvasTabBar />
+      <div className="relative flex-1">
       <ReactFlow
-        className="flex-1 bg-zinc-950"
+        className="h-full w-full bg-zinc-950"
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
@@ -139,6 +145,12 @@ export function DesignCanvas() {
         defaultEdgeOptions={{ type: "animated" }}
         fitView
         proOptions={{ hideAttribution: true }}
+        panOnDrag={!penActive}
+        zoomOnScroll={!penActive}
+        zoomOnPinch={!penActive}
+        nodesDraggable={!penActive}
+        nodesConnectable={!penActive}
+        elementsSelectable={!penActive}
       >
         <Background
           variant={BackgroundVariant.Dots}
@@ -159,6 +171,10 @@ export function DesignCanvas() {
           style={{ width: 140, height: 90 }}
         />
       </ReactFlow>
+
+        <PenOverlay />
+        <PenToolbar />
+      </div>
 
       {/* Empty state overlay */}
       {isEmpty && (
