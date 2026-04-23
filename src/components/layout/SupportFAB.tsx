@@ -7,19 +7,44 @@ interface SupportFABProps {
 }
 
 /**
- * Floating "Buy me a coffee" button.
- * Bottom-right on mobile; above the minimap on desktop so it doesn't collide.
+ * Circular "Buy me a coffee" floating action button.
+ * The label curls around the disc (SVG textPath) and slowly rotates.
+ * Coffee icon stays centered and still.
+ *
+ * Mobile: bottom-right corner. Desktop: sits to the left of the minimap.
  */
 export function SupportFAB({ onClick }: SupportFABProps) {
   return (
     <button
       onClick={onClick}
-      className="group fixed z-30 flex items-center gap-2 rounded-full border border-amber-300/40 bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 px-4 py-2.5 text-sm font-semibold text-zinc-950 shadow-lg shadow-amber-500/25 ring-1 ring-black/5 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-amber-500/40 active:translate-y-0 bottom-5 right-4 md:bottom-28 md:right-5"
+      className="group fixed bottom-5 right-4 z-30 flex h-24 w-24 items-center justify-center rounded-full border border-amber-300/40 bg-gradient-to-br from-amber-400 via-amber-500 to-orange-500 text-zinc-950 shadow-lg shadow-amber-500/30 ring-1 ring-black/5 transition-transform hover:-translate-y-0.5 hover:scale-[1.04] active:translate-y-0 md:right-[172px]"
       title="Buy me a coffee — support the project"
       aria-label="Buy me a coffee"
     >
-      <Coffee className="h-4 w-4 transition-transform group-hover:-rotate-6 group-hover:scale-110" />
-      <span>Buy me a coffee</span>
+      {/* Rotating text ring */}
+      <svg
+        viewBox="0 0 100 100"
+        className="pointer-events-none absolute inset-0 h-full w-full animate-[spin_18s_linear_infinite]"
+        aria-hidden="true"
+      >
+        <defs>
+          <path
+            id="support-fab-ring"
+            d="M 50,50 m -38,0 a 38,38 0 1,1 76,0 a 38,38 0 1,1 -76,0"
+          />
+        </defs>
+        <text
+          className="fill-zinc-950 font-bold"
+          style={{ fontSize: "10px", letterSpacing: "0.18em" }}
+        >
+          <textPath href="#support-fab-ring" startOffset="0">
+            BUY ME A COFFEE · BUY ME A COFFEE ·
+          </textPath>
+        </text>
+      </svg>
+
+      {/* Centered Coffee icon */}
+      <Coffee className="relative z-10 h-7 w-7 transition-transform group-hover:-rotate-6 group-hover:scale-110" />
     </button>
   );
 }
