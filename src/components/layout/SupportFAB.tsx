@@ -28,15 +28,15 @@ export function SupportFAB({ onClick }: SupportFABProps) {
         <defs>
           <path
             id="support-fab-arc-bottom"
-            d="M 16,50 A 34,34 0 0,1 84,50"
+            d="M 17.16,41.20 A 34,34 0 1,1 82.84,41.20"
             fill="none"
           />
         </defs>
         <text
           style={{
-            fontSize: "10px",
+            fontSize: "12px",
             fontWeight: 900,
-            letterSpacing: "0.04em",
+            letterSpacing: "0.02em",
             fill: "#09090b",
             stroke: "#09090b",
             strokeWidth: "0.4",
