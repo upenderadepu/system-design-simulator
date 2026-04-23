@@ -19,6 +19,7 @@ import {
   StickyNote,
   GraduationCap,
   Plus,
+  MoreHorizontal,
 } from "lucide-react";
 import { useAppStore } from "@/store/appStore";
 import { useCanvasStore } from "@/store/canvasStore";
@@ -38,18 +39,19 @@ interface TopBarProps {
   onLoad: () => void;
   onStartInterview: () => void;
   onCreateProblem: () => void;
+  onToggleLeft: () => void;
+  onToggleRight: () => void;
 }
 
-export function TopBar({ onSimulate, onScore, onClearCanvas, onSave, onLoad, onStartInterview, onCreateProblem }: TopBarProps) {
+export function TopBar({ onSimulate, onScore, onClearCanvas, onSave, onLoad, onStartInterview, onCreateProblem, onToggleLeft, onToggleRight }: TopBarProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
+  const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
   const { getViewport } = useReactFlow();
   const addNode = useCanvasStore((s) => s.addNode);
 
   const selectedProblemId = useAppStore((s) => s.selectedProblemId);
   const setSelectedProblem = useAppStore((s) => s.setSelectedProblem);
-  const toggleLeftSidebar = useAppStore((s) => s.toggleLeftSidebar);
-  const toggleRightPanel = useAppStore((s) => s.toggleRightPanel);
 
   const customProblems = useCustomProblemsStore((s) => s.problems);
   const currentProblem =
@@ -179,35 +181,37 @@ export function TopBar({ onSimulate, onScore, onClearCanvas, onSave, onLoad, onS
   }, [selectedProblemId]);
 
   return (
-    <header className="flex h-12 shrink-0 items-center justify-between border-b border-zinc-800 bg-zinc-900 px-3">
+    <header className="flex h-12 shrink-0 items-center justify-between gap-2 border-b border-zinc-800 bg-zinc-900 px-2 md:gap-3 md:px-3">
       {/* Left section */}
-      <div className="flex items-center gap-3">
+      <div className="flex min-w-0 items-center gap-2 md:gap-3">
         <button
-          onClick={toggleLeftSidebar}
-          className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
+          onClick={onToggleLeft}
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
           title="Toggle sidebar"
         >
           <PanelLeft className="h-4 w-4" />
         </button>
 
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <Zap className="h-4 w-4 text-cyan-500" />
-          <span className="text-sm font-semibold tracking-tight text-zinc-100">
+          <span className="hidden text-sm font-semibold tracking-tight text-zinc-100 sm:inline">
             SystemSim
           </span>
-          <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-[9px] font-medium text-zinc-500">beta</span>
+          <span className="hidden rounded bg-zinc-800 px-1.5 py-0.5 text-[9px] font-medium text-zinc-500 md:inline">beta</span>
         </div>
 
-        <div className="mx-2 h-4 w-px bg-zinc-800" />
+        <div className="mx-1 hidden h-4 w-px bg-zinc-800 md:block" />
 
         {/* Problem selector */}
-        <div className="relative">
+        <div className="relative min-w-0 flex-shrink">
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex items-center gap-1.5 rounded-md border border-zinc-700 bg-zinc-800 px-2.5 py-1 text-xs font-medium text-zinc-300 transition-colors hover:bg-zinc-700 hover:text-zinc-100"
+            className="flex min-w-0 items-center gap-1.5 rounded-md border border-zinc-700 bg-zinc-800 px-2.5 py-1.5 text-xs font-medium text-zinc-300 transition-colors hover:bg-zinc-700 hover:text-zinc-100"
           >
-            {currentProblem?.title ?? "Select Problem"}
-            <ChevronDown className="h-3 w-3 text-zinc-500" />
+            <span className="max-w-[120px] truncate md:max-w-none">
+              {currentProblem?.title ?? "Select Problem"}
+            </span>
+            <ChevronDown className="h-3 w-3 shrink-0 text-zinc-500" />
           </button>
 
           {dropdownOpen && (
@@ -279,7 +283,7 @@ export function TopBar({ onSimulate, onScore, onClearCanvas, onSave, onLoad, onS
         {!selectedProblemId.startsWith("custom-") && (
           <button
             onClick={loadReference}
-            className="flex items-center gap-1 rounded-md px-2 py-1 text-[10px] text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
+            className="hidden shrink-0 items-center gap-1 rounded-md px-2 py-1 text-[10px] text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300 md:flex"
             title="Load reference solution"
           >
             <Download className="h-3 w-3" />
@@ -287,27 +291,78 @@ export function TopBar({ onSimulate, onScore, onClearCanvas, onSave, onLoad, onS
           </button>
         )}
 
-        <div className="mx-1 h-4 w-px bg-zinc-800" />
+        <div className="mx-1 hidden h-4 w-px bg-zinc-800 md:block" />
 
         <button
           onClick={addTextNote}
-          className="flex items-center gap-1 rounded-md px-2 py-1 text-[10px] text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
+          className="hidden shrink-0 items-center gap-1 rounded-md px-2 py-1 text-[10px] text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200 md:flex"
           title="Add text note to canvas"
         >
           <StickyNote className="h-3 w-3" />
           Add Note
         </button>
 
-        <div className="mx-1 h-4 w-px bg-zinc-800" />
+        <div className="mx-1 hidden h-4 w-px bg-zinc-800 md:block" />
 
         <button
           onClick={onStartInterview}
-          className="flex items-center gap-1 rounded-md bg-zinc-800 px-2 py-1 text-[10px] font-medium text-zinc-300 transition-colors hover:bg-zinc-700 hover:text-zinc-100"
+          className="hidden shrink-0 items-center gap-1 rounded-md bg-zinc-800 px-2 py-1 text-[10px] font-medium text-zinc-300 transition-colors hover:bg-zinc-700 hover:text-zinc-100 md:flex"
           title="Start a guided interview practice"
         >
           <GraduationCap className="h-3.5 w-3.5" />
           Practice Interview
         </button>
+
+        {/* Mobile-only overflow menu */}
+        <div className="relative md:hidden">
+          <button
+            onClick={() => setMobileMoreOpen((v) => !v)}
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
+            title="More actions"
+            aria-label="More actions"
+          >
+            <MoreHorizontal className="h-4 w-4" />
+          </button>
+          {mobileMoreOpen && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setMobileMoreOpen(false)} />
+              <div className="absolute left-0 top-full z-50 mt-1 w-52 rounded-md border border-zinc-700 bg-zinc-900 py-1 shadow-lg">
+                {!selectedProblemId.startsWith("custom-") && (
+                  <button
+                    onClick={() => {
+                      setMobileMoreOpen(false);
+                      loadReference();
+                    }}
+                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-zinc-300 transition-colors hover:bg-zinc-800"
+                  >
+                    <Download className="h-3.5 w-3.5 text-zinc-500" />
+                    Load reference solution
+                  </button>
+                )}
+                <button
+                  onClick={() => {
+                    setMobileMoreOpen(false);
+                    addTextNote();
+                  }}
+                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-zinc-300 transition-colors hover:bg-zinc-800"
+                >
+                  <StickyNote className="h-3.5 w-3.5 text-zinc-500" />
+                  Add text note
+                </button>
+                <button
+                  onClick={() => {
+                    setMobileMoreOpen(false);
+                    onStartInterview();
+                  }}
+                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-zinc-300 transition-colors hover:bg-zinc-800"
+                >
+                  <GraduationCap className="h-3.5 w-3.5 text-zinc-500" />
+                  Practice interview
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Right section */}
@@ -401,14 +456,14 @@ export function TopBar({ onSimulate, onScore, onClearCanvas, onSave, onLoad, onS
           size="sm"
           variant="ghost"
           onClick={onScore}
-          className="h-7 gap-1.5 border border-zinc-700 bg-transparent px-3 text-xs font-medium text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
+          className="h-7 gap-1.5 border border-zinc-700 bg-transparent px-2.5 text-xs font-medium text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 sm:px-3"
         >
           <Trophy className="h-3 w-3" />
-          Score
+          <span className="hidden sm:inline">Score</span>
         </Button>
 
         <button
-          onClick={toggleRightPanel}
+          onClick={onToggleRight}
           className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
           title="Toggle panel"
         >

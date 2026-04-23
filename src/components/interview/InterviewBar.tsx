@@ -52,7 +52,7 @@ export function InterviewBar() {
   }
 
   return (
-    <div className="flex h-11 shrink-0 items-center justify-between border-b border-zinc-800 bg-zinc-900 px-3">
+    <div className="flex h-11 shrink-0 items-center justify-between gap-3 overflow-x-auto border-b border-zinc-800 bg-zinc-900 px-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {/* Phase stepper */}
       <div className="flex items-center gap-1">
         {phases.map((phase, i) => (

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { ReactFlowProvider, type Node } from "@xyflow/react";
+import { X } from "lucide-react";
 import { TopBar } from "./top-bar";
 import { Sidebar } from "@/components/sidebar/Sidebar";
 import { RightPanel } from "@/components/panel/RightPanel";
@@ -18,10 +19,19 @@ import { InterviewBar } from "@/components/interview/InterviewBar";
 import { InterviewStartDialog } from "@/components/interview/InterviewStartDialog";
 import { CreateProblemDialog } from "@/components/dialogs/CreateProblemDialog";
 import { useInterviewStore } from "@/store/interviewStore";
+import { useIsMobile } from "@/hooks/useBreakpoint";
 
 export function AppShell() {
+  const isMobile = useIsMobile();
   const leftSidebarOpen = useAppStore((s) => s.leftSidebarOpen);
   const rightPanelOpen = useAppStore((s) => s.rightPanelOpen);
+  const toggleLeftSidebar = useAppStore((s) => s.toggleLeftSidebar);
+  const toggleRightPanel = useAppStore((s) => s.toggleRightPanel);
+
+  // Mobile drawer state — local, does not persist
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [mobileRightOpen, setMobileRightOpen] = useState(false);
+
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [loadDialogOpen, setLoadDialogOpen] = useState(false);
   const [interviewDialogOpen, setInterviewDialogOpen] = useState(false);
@@ -30,13 +40,30 @@ export function AppShell() {
   const timerRunning = useInterviewStore((s) => s.timerRunning);
   const tickTimer = useInterviewStore((s) => s.tickTimer);
 
+  const handleToggleLeft = useCallback(() => {
+    if (isMobile) setMobileSidebarOpen((v) => !v);
+    else toggleLeftSidebar();
+  }, [isMobile, toggleLeftSidebar]);
+
+  const handleToggleRight = useCallback(() => {
+    if (isMobile) setMobileRightOpen((v) => !v);
+    else toggleRightPanel();
+  }, [isMobile, toggleRightPanel]);
+
+  // Close any open mobile drawers when we transition to desktop
+  useEffect(() => {
+    if (!isMobile) {
+      setMobileSidebarOpen(false);
+      setMobileRightOpen(false);
+    }
+  }, [isMobile]);
+
   const handleSave = useCallback(() => setSaveDialogOpen(true), []);
   const handleLoad = useCallback(() => setLoadDialogOpen(true), []);
   const handleSimulate = useCallback(() => {
     const { nodes, edges } = useCanvasStore.getState();
     const { config } = useSimulationStore.getState();
 
-    // Filter out text annotation nodes — they are not part of the system design
     const componentNodes = nodes.filter((n) => n.type !== "text") as Node<ComponentNodeData>[];
 
     if (componentNodes.length === 0) {
@@ -46,11 +73,9 @@ export function AppShell() {
 
     useSimulationStore.getState().setRunning(true);
 
-    // Use setTimeout to let React render the "Running..." state
     setTimeout(() => {
       const result = runSimulation(componentNodes, edges, config.requestsPerSec);
 
-      // Update node visuals
       const updates = new Map<string, Record<string, unknown>>();
       for (const [nodeId, metrics] of result.nodeMetrics) {
         updates.set(nodeId, {
@@ -69,8 +94,6 @@ export function AppShell() {
 
   const handleScore = useCallback(() => {
     const { nodes, edges } = useCanvasStore.getState();
-
-    // Filter out text annotation nodes — they are not part of the system design
     const componentNodes = nodes.filter((n) => n.type !== "text") as Node<ComponentNodeData>[];
 
     if (componentNodes.length === 0) {
@@ -83,8 +106,11 @@ export function AppShell() {
     useSimulationStore.getState().setShowScore(true);
     useAppStore.getState().setActiveRightTab("score");
 
+    // On mobile, auto-open the right sheet so the score is visible
+    if (isMobile) setMobileRightOpen(true);
+
     useAppStore.getState().showToast("Design scored!", "success");
-  }, []);
+  }, [isMobile]);
 
   const handleClearCanvas = useCallback(() => {
     useCanvasStore.getState().clearCanvas();
@@ -94,13 +120,11 @@ export function AppShell() {
   // Keyboard shortcuts
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
-      // Don't trigger shortcuts when typing in inputs
       const target = e.target as HTMLElement;
       if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
         return;
       }
 
-      // Delete or Backspace → delete selected node
       if (e.key === "Delete" || e.key === "Backspace") {
         const { selectedNodeId, deleteNode } = useCanvasStore.getState();
         if (selectedNodeId) {
@@ -109,41 +133,37 @@ export function AppShell() {
         }
       }
 
-      // Ctrl/Cmd + Enter → run simulation
       if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         handleSimulate();
       }
 
-      // Ctrl/Cmd + Shift + S → run scoring
       if (e.key === "s" && (e.metaKey || e.ctrlKey) && e.shiftKey) {
         e.preventDefault();
         handleScore();
       }
 
-      // Ctrl/Cmd + S → save design dialog
       if (e.key === "s" && (e.metaKey || e.ctrlKey) && !e.shiftKey) {
         e.preventDefault();
         setSaveDialogOpen(true);
       }
 
-      // Ctrl/Cmd + O → load design dialog
       if (e.key === "o" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         setLoadDialogOpen(true);
       }
 
-      // Escape → deselect node
       if (e.key === "Escape") {
-        useCanvasStore.getState().setSelectedNode(null);
+        if (mobileSidebarOpen) setMobileSidebarOpen(false);
+        else if (mobileRightOpen) setMobileRightOpen(false);
+        else useCanvasStore.getState().setSelectedNode(null);
       }
     }
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleSimulate, handleScore]);
+  }, [handleSimulate, handleScore, mobileSidebarOpen, mobileRightOpen]);
 
-  // Interview timer tick
   useEffect(() => {
     if (!timerRunning) return;
     const id = setInterval(() => {
@@ -156,12 +176,103 @@ export function AppShell() {
     <ReactFlowProvider>
       <div className="flex h-full flex-col">
         {interviewMode === "interview" && <InterviewBar />}
-        <TopBar onSimulate={handleSimulate} onScore={handleScore} onClearCanvas={handleClearCanvas} onSave={handleSave} onLoad={handleLoad} onStartInterview={() => setInterviewDialogOpen(true)} onCreateProblem={() => setCreateProblemDialogOpen(true)} />
+        <TopBar
+          onSimulate={handleSimulate}
+          onScore={handleScore}
+          onClearCanvas={handleClearCanvas}
+          onSave={handleSave}
+          onLoad={handleLoad}
+          onStartInterview={() => setInterviewDialogOpen(true)}
+          onCreateProblem={() => setCreateProblemDialogOpen(true)}
+          onToggleLeft={handleToggleLeft}
+          onToggleRight={handleToggleRight}
+        />
 
-        <div className="flex flex-1 overflow-hidden">
-          <Sidebar open={leftSidebarOpen} onCreateProblem={() => setCreateProblemDialogOpen(true)} />
+        <div className="relative flex flex-1 overflow-hidden">
+          {/* Desktop inline sidebar (hidden on mobile) */}
+          <Sidebar
+            open={leftSidebarOpen}
+            onCreateProblem={() => setCreateProblemDialogOpen(true)}
+            variant="desktop"
+          />
+
           <DesignCanvas />
-          <RightPanel open={rightPanelOpen} onSimulate={handleSimulate} />
+
+          {/* Desktop inline right panel (hidden on mobile) */}
+          <RightPanel open={rightPanelOpen} onSimulate={handleSimulate} variant="desktop" />
+
+          {/* Mobile: sidebar drawer from left */}
+          {isMobile && (
+            <>
+              {/* Backdrop */}
+              <div
+                className={`absolute inset-0 z-30 bg-black/60 transition-opacity md:hidden ${
+                  mobileSidebarOpen ? "opacity-100" : "pointer-events-none opacity-0"
+                }`}
+                onClick={() => setMobileSidebarOpen(false)}
+              />
+              {/* Drawer */}
+              <div
+                className={`absolute inset-y-0 left-0 z-40 flex w-[85%] max-w-[320px] flex-col border-r border-zinc-800 bg-zinc-900 shadow-xl transition-transform md:hidden ${
+                  mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
+                }`}
+                aria-hidden={!mobileSidebarOpen}
+                inert={!mobileSidebarOpen || undefined}
+              >
+                <div className="flex h-10 shrink-0 items-center justify-between border-b border-zinc-800 px-3">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Library</span>
+                  <button
+                    onClick={() => setMobileSidebarOpen(false)}
+                    className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
+                    aria-label="Close sidebar"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+                <div className="min-h-0 flex-1">
+                  <Sidebar
+                    onCreateProblem={() => {
+                      setCreateProblemDialogOpen(true);
+                      setMobileSidebarOpen(false);
+                    }}
+                    variant="mobile"
+                  />
+                </div>
+              </div>
+
+              {/* Mobile: right panel as bottom sheet */}
+              <div
+                className={`absolute inset-0 z-30 bg-black/60 transition-opacity md:hidden ${
+                  mobileRightOpen ? "opacity-100" : "pointer-events-none opacity-0"
+                }`}
+                onClick={() => setMobileRightOpen(false)}
+              />
+              <div
+                className={`absolute inset-x-0 bottom-0 z-40 flex max-h-[85%] flex-col rounded-t-2xl border-t border-zinc-800 bg-zinc-900 shadow-2xl transition-transform md:hidden ${
+                  mobileRightOpen ? "translate-y-0" : "translate-y-full"
+                }`}
+                aria-hidden={!mobileRightOpen}
+                inert={!mobileRightOpen || undefined}
+              >
+                <div className="flex shrink-0 items-center justify-between pt-2">
+                  <div className="flex-1" />
+                  <div className="sheet-handle" />
+                  <div className="flex flex-1 justify-end pr-3">
+                    <button
+                      onClick={() => setMobileRightOpen(false)}
+                      className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
+                      aria-label="Close panel"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+                <div className="min-h-0 flex-1 pb-[env(safe-area-inset-bottom)]">
+                  <RightPanel onSimulate={handleSimulate} variant="mobile" />
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         <Toast />

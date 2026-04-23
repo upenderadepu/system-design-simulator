@@ -21,22 +21,90 @@ import { useInterviewStore } from "@/store/interviewStore";
 import { InterviewPhasePanel } from "@/components/interview/InterviewPhasePanel";
 
 interface RightPanelProps {
-  open: boolean;
+  open?: boolean;
   onSimulate: () => void;
+  variant?: "desktop" | "mobile";
 }
 
-export function RightPanel({ open, onSimulate }: RightPanelProps) {
+function RightTabs({ onSimulate }: { onSimulate: () => void }) {
   const activeRightTab = useAppStore((s) => s.activeRightTab);
   const setActiveRightTab = useAppStore((s) => s.setActiveRightTab);
+
+  return (
+    <Tabs value={activeRightTab} onValueChange={(v) => setActiveRightTab(v as typeof activeRightTab)} className="flex flex-1 flex-col min-h-0">
+      <div className="mx-2 mt-2 shrink-0 overflow-x-auto">
+        <TabsList className="h-8 w-max bg-zinc-800">
+          <TabsTrigger value="properties" className="h-7 px-2 text-[11px] data-[state=active]:bg-zinc-700 data-[state=active]:text-zinc-100">Props</TabsTrigger>
+          <TabsTrigger value="simulation" className="h-7 px-2 text-[11px] data-[state=active]:bg-zinc-700 data-[state=active]:text-zinc-100">Simulate</TabsTrigger>
+          <TabsTrigger value="score" className="h-7 px-2 text-[11px] data-[state=active]:bg-zinc-700 data-[state=active]:text-zinc-100">Score</TabsTrigger>
+          <TabsTrigger value="capacity" className="h-7 px-2 text-[11px] data-[state=active]:bg-zinc-700 data-[state=active]:text-zinc-100">Capacity</TabsTrigger>
+          <TabsTrigger value="tradeoffs" className="h-7 px-2 text-[11px] data-[state=active]:bg-zinc-700 data-[state=active]:text-zinc-100">Trade-offs</TabsTrigger>
+        </TabsList>
+      </div>
+
+      <TabsContent value="properties" className="mt-0 flex-1 overflow-hidden">
+        <ScrollArea className="h-full">
+          <div className="p-3">
+            <PropertiesTab />
+          </div>
+        </ScrollArea>
+      </TabsContent>
+
+      <TabsContent value="simulation" className="mt-0 flex-1 overflow-hidden">
+        <ScrollArea className="h-full">
+          <div className="p-3 space-y-4">
+            <SimulationControls onSimulate={onSimulate} />
+            <Separator className="bg-zinc-800" />
+            <MetricsDisplay />
+          </div>
+        </ScrollArea>
+      </TabsContent>
+
+      <TabsContent value="score" className="mt-0 flex-1 overflow-hidden">
+        <div className="h-full p-3">
+          <ScoreReport />
+        </div>
+      </TabsContent>
+
+      <TabsContent value="capacity" className="mt-0 flex-1 overflow-hidden">
+        <ScrollArea className="h-full">
+          <div className="p-3">
+            <CapacityCalculator />
+          </div>
+        </ScrollArea>
+      </TabsContent>
+
+      <TabsContent value="tradeoffs" className="mt-0 flex-1 overflow-hidden">
+        <ScrollArea className="h-full">
+          <div className="p-3 space-y-4">
+            <TradeoffLog />
+            <Separator className="bg-zinc-800" />
+            <TradeoffCards />
+          </div>
+        </ScrollArea>
+      </TabsContent>
+    </Tabs>
+  );
+}
+
+export function RightPanel({ open = true, onSimulate, variant = "desktop" }: RightPanelProps) {
   const interviewMode = useInterviewStore((s) => s.mode);
   const currentPhase = useInterviewStore((s) => s.currentPhase);
 
   // During interview mode, show phase panel for all phases except phase 4 (HLD)
   const showInterviewPhasePanel = interviewMode === "interview" && currentPhase !== 4;
 
+  if (variant === "mobile") {
+    return (
+      <div className="flex h-full w-full flex-col bg-zinc-900">
+        {showInterviewPhasePanel ? <InterviewPhasePanel /> : <RightTabs onSimulate={onSimulate} />}
+      </div>
+    );
+  }
+
   return (
     <aside
-      className={`flex shrink-0 flex-col border-l border-zinc-800 bg-zinc-900 overflow-hidden transition-all duration-200 ${
+      className={`hidden shrink-0 flex-col border-l border-zinc-800 bg-zinc-900 overflow-hidden transition-all duration-200 md:flex ${
         open ? "w-[300px] opacity-100" : "w-0 opacity-0 border-l-0"
       }`}
       aria-hidden={!open || undefined}
@@ -45,61 +113,9 @@ export function RightPanel({ open, onSimulate }: RightPanelProps) {
       {showInterviewPhasePanel ? (
         <InterviewPhasePanel />
       ) : (
-      <div className="flex w-[300px] flex-1 flex-col min-h-0">
-        <Tabs value={activeRightTab} onValueChange={(v) => setActiveRightTab(v as typeof activeRightTab)} className="flex flex-1 flex-col min-h-0">
-          <div className="mx-2 mt-2 shrink-0 overflow-x-auto">
-            <TabsList className="h-8 w-max bg-zinc-800">
-              <TabsTrigger value="properties" className="h-7 px-2 text-[11px] data-[state=active]:bg-zinc-700 data-[state=active]:text-zinc-100">Props</TabsTrigger>
-              <TabsTrigger value="simulation" className="h-7 px-2 text-[11px] data-[state=active]:bg-zinc-700 data-[state=active]:text-zinc-100">Simulate</TabsTrigger>
-              <TabsTrigger value="score" className="h-7 px-2 text-[11px] data-[state=active]:bg-zinc-700 data-[state=active]:text-zinc-100">Score</TabsTrigger>
-              <TabsTrigger value="capacity" className="h-7 px-2 text-[11px] data-[state=active]:bg-zinc-700 data-[state=active]:text-zinc-100">Capacity</TabsTrigger>
-              <TabsTrigger value="tradeoffs" className="h-7 px-2 text-[11px] data-[state=active]:bg-zinc-700 data-[state=active]:text-zinc-100">Trade-offs</TabsTrigger>
-            </TabsList>
-          </div>
-
-          <TabsContent value="properties" className="mt-0 flex-1 overflow-hidden">
-            <ScrollArea className="h-full">
-              <div className="p-3">
-                <PropertiesTab />
-              </div>
-            </ScrollArea>
-          </TabsContent>
-
-          <TabsContent value="simulation" className="mt-0 flex-1 overflow-hidden">
-            <ScrollArea className="h-full">
-              <div className="p-3 space-y-4">
-                <SimulationControls onSimulate={onSimulate} />
-                <Separator className="bg-zinc-800" />
-                <MetricsDisplay />
-              </div>
-            </ScrollArea>
-          </TabsContent>
-
-          <TabsContent value="score" className="mt-0 flex-1 overflow-hidden">
-            <div className="h-full p-3">
-              <ScoreReport />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="capacity" className="mt-0 flex-1 overflow-hidden">
-            <ScrollArea className="h-full">
-              <div className="p-3">
-                <CapacityCalculator />
-              </div>
-            </ScrollArea>
-          </TabsContent>
-
-          <TabsContent value="tradeoffs" className="mt-0 flex-1 overflow-hidden">
-            <ScrollArea className="h-full">
-              <div className="p-3 space-y-4">
-                <TradeoffLog />
-                <Separator className="bg-zinc-800" />
-                <TradeoffCards />
-              </div>
-            </ScrollArea>
-          </TabsContent>
-        </Tabs>
-      </div>
+        <div className="flex w-[300px] flex-1 flex-col min-h-0">
+          <RightTabs onSimulate={onSimulate} />
+        </div>
       )}
     </aside>
   );

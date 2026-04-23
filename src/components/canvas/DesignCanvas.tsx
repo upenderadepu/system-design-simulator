@@ -164,7 +164,7 @@ export function DesignCanvas() {
           position="bottom-left"
         />
         <MiniMap
-          className="!rounded-md !border !border-zinc-800 !bg-zinc-900"
+          className="!hidden !rounded-md !border !border-zinc-800 !bg-zinc-900 md:!block"
           maskColor="rgba(9, 9, 11, 0.7)"
           nodeColor={miniMapNodeColor}
           position="bottom-right"

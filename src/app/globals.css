@@ -129,6 +129,28 @@
   }
 }
 
+/* Full viewport height with dvh fallback so mobile browser chrome doesn't shift layout */
+html, body { height: 100%; }
+@supports (height: 100dvh) {
+  html, body { height: 100dvh; }
+}
+
+/* iOS safe areas */
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+.safe-top    { padding-top:    env(safe-area-inset-top, 0px); }
+
+/* Kill double-tap-zoom delay on interactive controls */
+button, a, [role="button"], input, textarea, select { touch-action: manipulation; }
+
+/* Sheet drag handle */
+.sheet-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 9999px;
+  background: rgb(63, 63, 70);
+  margin-inline: auto;
+}
+
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgb(63, 63, 70); border-radius: 3px; }
