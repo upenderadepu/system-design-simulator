@@ -22,6 +22,7 @@ import { LoadDialog } from "@/components/dialogs/LoadDialog";
 import { InterviewBar } from "@/components/interview/InterviewBar";
 import { InterviewStartDialog } from "@/components/interview/InterviewStartDialog";
 import { CreateProblemDialog } from "@/components/dialogs/CreateProblemDialog";
+import { CreateComponentDialog } from "@/components/dialogs/CreateComponentDialog";
 import { SupportDialog } from "@/components/dialogs/SupportDialog";
 import { useInterviewStore } from "@/store/interviewStore";
 import { useIsMobile } from "@/hooks/useBreakpoint";
@@ -41,6 +42,7 @@ export function AppShell() {
   const [loadDialogOpen, setLoadDialogOpen] = useState(false);
   const [interviewDialogOpen, setInterviewDialogOpen] = useState(false);
   const [createProblemDialogOpen, setCreateProblemDialogOpen] = useState(false);
+  const [createComponentDialogOpen, setCreateComponentDialogOpen] = useState(false);
   const [supportDialogOpen, setSupportDialogOpen] = useState(false);
 
   // Auto-open support dialog when URL has ?support=1 (used by the README link)
@@ -283,6 +285,7 @@ export function AppShell() {
           <Sidebar
             open={leftSidebarOpen}
             onCreateProblem={() => setCreateProblemDialogOpen(true)}
+            onCreateCustomComponent={() => setCreateComponentDialogOpen(true)}
             variant="desktop"
           />
 
@@ -327,6 +330,10 @@ export function AppShell() {
                   <Sidebar
                     onCreateProblem={() => {
                       setCreateProblemDialogOpen(true);
+                      setMobileSidebarOpen(false);
+                    }}
+                    onCreateCustomComponent={() => {
+                      setCreateComponentDialogOpen(true);
                       setMobileSidebarOpen(false);
                     }}
                     variant="mobile"
@@ -377,6 +384,7 @@ export function AppShell() {
         <LoadDialog open={loadDialogOpen} onClose={() => setLoadDialogOpen(false)} />
         <InterviewStartDialog open={interviewDialogOpen} onClose={() => setInterviewDialogOpen(false)} />
         <CreateProblemDialog open={createProblemDialogOpen} onClose={() => setCreateProblemDialogOpen(false)} />
+        <CreateComponentDialog open={createComponentDialogOpen} onClose={() => setCreateComponentDialogOpen(false)} />
         <SupportDialog open={supportDialogOpen} onClose={() => setSupportDialogOpen(false)} />
       </div>
     </ReactFlowProvider>

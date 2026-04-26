@@ -1,4 +1,5 @@
 import type { SystemComponent } from "@/types/component";
+import { useCustomComponentsStore } from "@/store/customComponentsStore";
 
 export const SYSTEM_COMPONENTS: SystemComponent[] = [
   // Networking
@@ -456,5 +457,7 @@ export const COMPONENT_CATEGORIES = [
 ] as const;
 
 export function getComponentById(id: string): SystemComponent | undefined {
-  return SYSTEM_COMPONENTS.find((c) => c.id === id);
+  const builtin = SYSTEM_COMPONENTS.find((c) => c.id === id);
+  if (builtin) return builtin;
+  return useCustomComponentsStore.getState().getComponent(id);
 }

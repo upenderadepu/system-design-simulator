@@ -9,10 +9,17 @@ import { useAppStore } from "@/store/appStore";
 interface SidebarProps {
   open?: boolean;
   onCreateProblem?: () => void;
+  onCreateCustomComponent?: () => void;
   variant?: "desktop" | "mobile";
 }
 
-function SidebarTabs({ onCreateProblem }: { onCreateProblem?: () => void }) {
+function SidebarTabs({
+  onCreateProblem,
+  onCreateCustomComponent,
+}: {
+  onCreateProblem?: () => void;
+  onCreateCustomComponent?: () => void;
+}) {
   const activeLeftTab = useAppStore((s) => s.activeLeftTab);
   const setActiveLeftTab = useAppStore((s) => s.setActiveLeftTab);
   return (
@@ -39,7 +46,7 @@ function SidebarTabs({ onCreateProblem }: { onCreateProblem?: () => void }) {
       </TabsList>
 
       <TabsContent value="components" className="mt-0 flex-1 min-h-0 overflow-hidden">
-        <ComponentPalette />
+        <ComponentPalette onCreateCustomComponent={onCreateCustomComponent} />
       </TabsContent>
 
       <TabsContent value="problems" className="mt-0 flex-1 min-h-0 overflow-hidden">
@@ -53,11 +60,19 @@ function SidebarTabs({ onCreateProblem }: { onCreateProblem?: () => void }) {
   );
 }
 
-export function Sidebar({ open = true, onCreateProblem, variant = "desktop" }: SidebarProps) {
+export function Sidebar({
+  open = true,
+  onCreateProblem,
+  onCreateCustomComponent,
+  variant = "desktop",
+}: SidebarProps) {
   if (variant === "mobile") {
     return (
       <div className="flex h-full w-full flex-col bg-zinc-900">
-        <SidebarTabs onCreateProblem={onCreateProblem} />
+        <SidebarTabs
+          onCreateProblem={onCreateProblem}
+          onCreateCustomComponent={onCreateCustomComponent}
+        />
       </div>
     );
   }
@@ -71,7 +86,10 @@ export function Sidebar({ open = true, onCreateProblem, variant = "desktop" }: S
       inert={!open || undefined}
     >
       <div className="flex w-[280px] flex-1 flex-col min-h-0">
-        <SidebarTabs onCreateProblem={onCreateProblem} />
+        <SidebarTabs
+          onCreateProblem={onCreateProblem}
+          onCreateCustomComponent={onCreateCustomComponent}
+        />
       </div>
     </aside>
   );
