@@ -8,7 +8,7 @@
 
 **The open-source system design interview simulator.**
 
-Build real architectures on a canvas · simulate production traffic · get scored like a real interview.
+Build real architectures · simulate production traffic · get scored like a real interview.
 
 <br/>
 
