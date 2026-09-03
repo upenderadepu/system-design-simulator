@@ -8,7 +8,7 @@
 
 **The open-source system design interview simulator.**
 
-Build real architectures on a canvas · simulate production traffic · get scored like a real interview.
+Build real architectures · simulate production traffic · get scored like a real interview.
 
 <br/>
 
@@ -18,6 +18,7 @@ Build real architectures on a canvas · simulate production traffic · get score
 [![Tailwind](https://img.shields.io/badge/Tailwind_v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![ReactFlow](https://img.shields.io/badge/ReactFlow_v12-FF0072?style=for-the-badge)](https://reactflow.dev)
 
+[![CI](https://img.shields.io/github/actions/workflow/status/vijaygupta18/system-design-simulator/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/vijaygupta18/system-design-simulator/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/github/license/vijaygupta18/system-design-simulator?style=flat-square)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-22c55e.svg?style=flat-square)](#contributing)
 [![Stars](https://img.shields.io/github/stars/vijaygupta18/system-design-simulator?style=flat-square)](https://github.com/vijaygupta18/system-design-simulator/stargazers)
@@ -332,10 +333,13 @@ src/
 Contributions are welcome — new problems, components, trade-off cards, bug fixes, and UX polish all help. Please open an issue first to discuss larger changes.
 
 ```bash
+npm ci            # Install exact locked dependencies
 npm run dev       # Start the dev server
-npm run build     # Production build (also type-checks)
 npm run lint      # Run ESLint
+npm run build     # Production build (also type-checks)
 ```
+
+CI runs `npm run lint` and `npm run build` on every push and pull request, so run both locally before opening a PR. Bug reports and feature requests have [issue templates](.github/ISSUE_TEMPLATE) — filling them in makes triage much faster.
 
 **Good first contributions:** add a design problem to `src/data/problems.ts` (+ its `interviewData.ts` entry), author a trade-off card, or improve concept-library content. Every formula, figure, and real-world attribution should be technically correct — this content teaches people preparing for real interviews.
 

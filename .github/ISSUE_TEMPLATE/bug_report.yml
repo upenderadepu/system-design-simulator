@@ -1,0 +1,43 @@
+name: Bug report
+description: Something is broken or behaves unexpectedly
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: A clear description of the bug. Screenshots or a screen recording help a lot.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open problem "URL Shortener"
+        2. Drag a Cache onto the canvas and wire it to ...
+        3. Click "Simulate"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Canvas / wiring
+        - Traffic simulation
+        - Scoring
+        - Interview mode
+        - Problems / content
+        - Mobile / touch
+        - Save / load / export
+        - Other
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      placeholder: "Chrome 128 / macOS 15 / iPhone 15 Safari"
